@@ -1,0 +1,25 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'ls', '--depth', '0', '--json' ]
+2 info using npm@3.5.2
+3 info using node@v8.10.0
+4 error extraneous: @nestjs/mongoose@5.2.2 /mnt/3B710B7935906684/WF/wefood-api/node_modules/@nestjs/mongoose
+4 error extraneous: @nestjs/swagger@2.5.1 /mnt/3B710B7935906684/WF/wefood-api/node_modules/@nestjs/swagger
+4 error extraneous: automapper-ts@1.9.0 /mnt/3B710B7935906684/WF/wefood-api/node_modules/automapper-ts
+4 error extraneous: config@3.0.1 /mnt/3B710B7935906684/WF/wefood-api/node_modules/config
+4 error extraneous: mongoose@5.4.11 /mnt/3B710B7935906684/WF/wefood-api/node_modules/mongoose
+5 verbose exit [ 1, true ]
+6 verbose stack Error: write EPIPE
+6 verbose stack     at _errnoException (util.js:1022:11)
+6 verbose stack     at WriteWrap.afterWrite [as oncomplete] (net.js:880:14)
+7 verbose cwd /mnt/3B710B7935906684/WF/wefood-api
+8 error Linux 4.15.0-45-generic
+9 error argv "/usr/bin/node" "/usr/bin/npm" "ls" "--depth" "0" "--json"
+10 error node v8.10.0
+11 error npm  v3.5.2
+12 error code EPIPE
+13 error errno EPIPE
+14 error syscall write
+15 error write EPIPE
+16 error If you need help, you may report this error at:
+16 error     <https://github.com/npm/npm/issues>
+17 verbose exit [ 1, true ]
