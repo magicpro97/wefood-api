@@ -33,6 +33,9 @@
 ```bash
 $ npm install
 ```
+```bash
+$ npm i -g @nestjs/cli
+```
 
 ## Running the app
 
