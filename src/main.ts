@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const hostDomain = AppModule.isDev
+    ? `${AppModule.host}:${AppModule.port}`
+    : AppModule.host;
+  await app.listen(AppModule.port);
 }
 bootstrap();
