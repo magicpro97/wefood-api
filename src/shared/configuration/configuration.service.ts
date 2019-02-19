@@ -6,10 +6,10 @@ import {get} from 'config';
 export class ConfigurationService {
     static connectionString: string =
         process.env[Configuration.MONG_URI] || get(Configuration.MONG_URI);
-    private envoirementHosting: string = process.env.NODE_ENV || 'development';
+    private environmentHosting: string = process.env.NODE_ENV || 'development';
 
     get isDevelopment(): boolean {
-        return this.envoirementHosting === 'development';
+        return this.environmentHosting === 'development';
     }
 
     get(name: string): string {
