@@ -36,7 +36,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api');
     app.useGlobalFilters(new HttpExceptionFilter());
 
-    await app.listen(AppModule.port);
+    await app.listen(process.env.PORT || AppModule.port);
 }
 
 bootstrap();
