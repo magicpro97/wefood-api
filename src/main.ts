@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import cors from 'cors';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -35,17 +36,7 @@ async function bootstrap() {
     });
     app.setGlobalPrefix('api');
     app.useGlobalFilters(new HttpExceptionFilter());
-    app.enableCors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-        allowedHeaders: [
-            'Access-Control-Allow-Origin',
-            'Access-Control-Allow-Headers',
-            'Origin, X-Requested-With, Content-Type, Accept',
-        ],
-    });
+    app.use(cors());
 
     await app.listen(process.env.PORT || AppModule.port);
 }
