@@ -1,0 +1,5 @@
+{
+    "HOST": "https://wefoods.herokuapp.com",
+    "MONGO_URI": "mongodb://dbuser:dbpassword1@ds151393.mlab.com:51393/wefoods",
+    "JWT_KEY": "MySuperPassword!234"
+}
