@@ -2,6 +2,7 @@ import {BaseModelVm} from '../../../shared/base.model-vm';
 import {UserRole} from '../user-role.enum';
 import {ApiModelProperty, ApiModelPropertyOptional} from '@nestjs/swagger';
 import {EnumToArray} from '../../../shared/utilities/enum-to-array';
+import { ObjectId } from 'bson';
 
 export class UserVm extends BaseModelVm {
     @ApiModelProperty()
@@ -33,4 +34,10 @@ export class UserVm extends BaseModelVm {
 
     @ApiModelPropertyOptional()
     dob?: Date;
+
+    @ApiModelPropertyOptional()
+    follower?: ObjectId[];
+
+    @ApiModelPropertyOptional()
+    following?: ObjectId[];
 }
