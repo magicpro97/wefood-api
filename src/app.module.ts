@@ -6,6 +6,7 @@ import {SharedModule} from './shared/shared.module';
 import {ConfigurationService} from './shared/configuration/configuration.service';
 import {Configuration} from './shared/configuration/configuration.enum';
 import {UserModule} from './user/user.module';
+import { FoodTagModule } from './food-tag/food-tag.module';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import {UserModule} from './user/user.module';
             useNewUrlParser: true,
         }),
         UserModule,
+        FoodTagModule,
     ],
     controllers: [AppController],
     providers: [AppService],
