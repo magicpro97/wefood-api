@@ -1,6 +1,7 @@
 import {BaseModel, schemaOptions} from '../../shared/base.model';
 import {UserRole} from './user-role.enum';
 import {ModelType, prop} from 'typegoose';
+import { ObjectId } from 'bson';
 
 export class User extends BaseModel<User> {
     @prop({
@@ -34,6 +35,10 @@ export class User extends BaseModel<User> {
     srcImage?: string;
     @prop()
     email?: string;
+    @prop()
+    following?: ObjectId[];
+    @prop()
+    follower?: ObjectId[];
 
     static get model(): ModelType<User> {
         return new User().getModelForClass(User, {schemaOptions});
