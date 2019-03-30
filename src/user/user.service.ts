@@ -1,22 +1,31 @@
-import {forwardRef, HttpException, HttpStatus, Inject, Injectable} from '@nestjs/common';
-import {BaseService} from '../shared/base.service';
-import {User} from './models/user.model';
-import {InjectModel} from '@nestjs/mongoose';
-import {ModelType} from 'typegoose';
-import {MapperService} from '../shared/mapper/mapper.service';
-import {RegisterVm} from './models/view-models/register-response-vm.model';
-import {compare, genSalt, hash} from 'bcryptjs';
-import {LoginVm} from './models/view-models/login-vm.model';
-import {AuthService} from '../shared/auth/auth.service';
-import {JwtPayload} from '../shared/auth/jwt-payload';
-import {UserVm} from './models/view-models/user-vm.model';
-import {LoginResponseVm} from './models/view-models/login-response-vm.model';
+import {
+    forwardRef,
+    HttpException,
+    HttpStatus,
+    Inject,
+    Injectable,
+} from '@nestjs/common';
+import { BaseService } from '../shared/base.service';
+import { User } from './models/user.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { ModelType } from 'typegoose';
+import { MapperService } from '../shared/mapper/mapper.service';
+import { RegisterVm } from './models/view-models/register-response-vm.model';
+import { compare, genSalt, hash } from 'bcryptjs';
+import { LoginVm } from './models/view-models/login-vm.model';
+import { AuthService } from '../shared/auth/auth.service';
+import { JwtPayload } from '../shared/auth/jwt-payload';
+import { UserVm } from './models/view-models/user-vm.model';
+import { LoginResponseVm } from './models/view-models/login-response-vm.model';
 
 @Injectable()
 export class UserService extends BaseService<User> {
-    constructor(@InjectModel(User.modelName) private readonly userModel: ModelType<User>,
-                private readonly mapperService: MapperService,
-                @Inject(forwardRef(() => AuthService)) readonly authService: AuthService,
+    constructor(
+        @InjectModel(User.modelName)
+        private readonly userModel: ModelType<User>,
+        private readonly mapperService: MapperService,
+        @Inject(forwardRef(() => AuthService))
+        readonly authService: AuthService,
     ) {
         super();
         this.model = userModel;
@@ -24,7 +33,17 @@ export class UserService extends BaseService<User> {
     }
 
     async register(registerVm: RegisterVm): Promise<User> {
-        const {username, password, address, dob, email, firstName, lastName, sex, srcImage} = registerVm;
+        const {
+            username,
+            password,
+            address,
+            dob,
+            email,
+            firstName,
+            lastName,
+            sex,
+            srcImage,
+        } = registerVm;
         const newUser = new this.model();
         newUser.username = username;
         newUser.firstName = firstName;
@@ -46,16 +65,22 @@ export class UserService extends BaseService<User> {
     }
 
     async login(loginVm: LoginVm): Promise<LoginResponseVm> {
-        const {username, password} = loginVm;
-        const user = await this.findOne({username});
+        const { username, password } = loginVm;
+        const user = await this.findOne({ username });
 
         if (!user) {
-            throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+            throw new HttpException(
+                'Invalid credentials',
+                HttpStatus.BAD_REQUEST,
+            );
         }
         const isMatch = await compare(password, user.password);
 
         if (!isMatch) {
-            throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+            throw new HttpException(
+                'Invalid credentials',
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
         const payload: JwtPayload = {

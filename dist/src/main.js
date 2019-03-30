@@ -12,12 +12,14 @@ const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
 const http_exception_filter_1 = require("./shared/filters/http-exception.filter");
+const cors = require("cors");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
         const hostDomain = app_module_1.AppModule.isDev
             ? `${app_module_1.AppModule.host}:${app_module_1.AppModule.port}`
             : app_module_1.AppModule.host;
+        app.use(cors());
         const swaggerOptions = new swagger_1.DocumentBuilder()
             .setTitle('We foods')
             .setDescription('API Documentation')

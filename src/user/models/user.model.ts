@@ -1,6 +1,7 @@
-import {BaseModel, schemaOptions} from '../../shared/base.model';
-import {UserRole} from './user-role.enum';
-import {ModelType, prop} from 'typegoose';
+import { BaseModel, schemaOptions } from '../../shared/base.model';
+import { UserRole } from './user-role.enum';
+import { ModelType, prop } from 'typegoose';
+import { ObjectId } from 'bson';
 
 export class User extends BaseModel<User> {
     @prop({
@@ -16,7 +17,7 @@ export class User extends BaseModel<User> {
     })
     password: string;
 
-    @prop({enum: UserRole, default: UserRole.User})
+    @prop({ enum: UserRole, default: UserRole.User })
     role?: UserRole;
 
     @prop()
@@ -34,17 +35,16 @@ export class User extends BaseModel<User> {
     srcImage?: string;
     @prop()
     email?: string;
+    @prop()
+    following?: ObjectId[];
+    @prop()
+    follower?: ObjectId[];
 
     static get model(): ModelType<User> {
-        return new User().getModelForClass(User, {schemaOptions});
+        return new User().getModelForClass(User, { schemaOptions });
     }
 
     static get modelName(): string {
         return this.model.modelName;
-    }
-
-    @prop()
-    get fullName(): string {
-        return `${this.firstName} ${this.lastName}`;
     }
 }
