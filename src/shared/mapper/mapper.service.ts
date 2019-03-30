@@ -14,6 +14,9 @@ export class MapperService {
         config.createMap('User', 'UserVm')
             .forSourceMember('_id', opts => opts.ignore())
             .forSourceMember('password', opts => opts.ignore());
+
+            config.createMap('FoodTag', 'FoodTagVm').forSourceMember('_id', opts => opts.ignore());
+            config.createMap('FoodTag[]', 'FoodTagVm[]').forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {
