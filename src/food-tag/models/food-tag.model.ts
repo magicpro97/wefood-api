@@ -1,4 +1,4 @@
-import { BaseModel } from 'dist/src/shared/base.model';
+import { BaseModel } from 'src/shared/base.model';
 import { prop, ModelType } from 'typegoose';
 import { schemaOptions } from 'src/shared/base.model';
 

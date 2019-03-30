@@ -1,7 +1,7 @@
 import {pre, prop, Typegoose} from 'typegoose';
 import {SchemaOptions} from 'mongoose';
 
-@pre<T>('findOneAndUpdate', function (next) {
+@pre<T>('findOneAndUpdate', next => {
     this.update.updateAt = new Date(Date.now());
     next();
 })

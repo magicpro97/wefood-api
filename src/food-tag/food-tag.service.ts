@@ -1,24 +1,25 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { BaseService } from 'dist/src/shared/base.service';
-import { FoodTag } from '../models/food-tag.model';
+import { BaseService } from 'src/shared/base.service';
+import { FoodTag } from './models/food-tag.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from 'src/shared/mapper/mapper.service';
-import { FoodTagParams } from '../models/view-models/food-tag-params.model';
+import { FoodTagParams } from './models/view-models/food-tag-params.model';
 
 @Injectable()
-export class FoodTagService extends BaseService<FoodTag>{
+export class FoodTagService extends BaseService<FoodTag> {
     constructor(
-        @InjectModel(FoodTag.modelName) private readonly _foodTagModel: ModelType<FoodTag>,
-        private readonly _mapperService: MapperService,
+        @InjectModel(FoodTag.modelName)
+        private readonly foodTagModel: ModelType<FoodTag>,
+        private readonly mapperService: MapperService,
     ) {
         super();
-        this.model = _foodTagModel;
-        this.mapper = _mapperService.mapper;
+        this.model = foodTagModel;
+        this.mapper = mapperService.mapper;
     }
 
     async createFoodTag(params: FoodTagParams): Promise<FoodTag> {
-        const { tagName} = params;
+        const { tagName } = params;
 
         const newFoodTag = new this.model();
 
