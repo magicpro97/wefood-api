@@ -72,6 +72,14 @@ __decorate([
 ], User.prototype, "email", void 0);
 __decorate([
     typegoose_1.prop(),
+    __metadata("design:type", Array)
+], User.prototype, "following", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", Array)
+], User.prototype, "follower", void 0);
+__decorate([
+    typegoose_1.prop(),
     __metadata("design:type", String),
     __metadata("design:paramtypes", [])
 ], User.prototype, "fullName", null);
