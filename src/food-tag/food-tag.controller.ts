@@ -15,7 +15,7 @@ import { FoodTagService } from './food-tag.service';
 import { map, isArray } from 'lodash';
 import { FoodTagVm } from './models/view-models/food-tag-vm.model';
 import { FoodTagParams } from './models/view-models/food-tag-params.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 
 @Controller('food-tag')
 @ApiUseTags(FoodTag.modelName)
