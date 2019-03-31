@@ -1,12 +1,11 @@
-import { BaseModelVm } from '../../../shared/base.model-vm';
-import { UserRole } from '../user-role.enum';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { UserRole } from '../user-role.enum';
+import { ObjectId } from 'mongodb';
 import { EnumToArray } from '../../../shared/utilities/enum-to-array';
-import { ObjectId } from 'bson';
 
-export class UserVm extends BaseModelVm {
+export class UpdateVm {
     @ApiModelProperty()
-    username: string;
+    id: string;
 
     @ApiModelPropertyOptional()
     firstname?: string;

@@ -54,6 +54,7 @@ export class FoodTagController {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: FoodTagVm, isArray: true })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: FoodTagVm })
