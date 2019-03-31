@@ -1,6 +1,6 @@
-import { BaseModel } from 'dist/src/shared/base.model';
+import { BaseModel } from '../../shared/base.model';
 import { prop, ModelType } from 'typegoose';
-import { schemaOptions } from 'src/shared/base.model';
+import { schemaOptions } from '../../shared/base.model';
 
 export class FoodTag extends BaseModel<FoodTag> {
     @prop({ required: [true, 'Content is required'], unique: true })

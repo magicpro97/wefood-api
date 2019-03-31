@@ -11,16 +11,16 @@ import {
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { FoodTag } from './models/food-tag.model';
-import { FoodTagService } from './food-tag/food-tag.service';
+import { FoodTagService } from './food-tag.service';
 import { map, isArray } from 'lodash';
 import { FoodTagVm } from './models/view-models/food-tag-vm.model';
 import { FoodTagParams } from './models/view-models/food-tag-params.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 
 @Controller('food-tag')
 @ApiUseTags(FoodTag.modelName)
 export class FoodTagController {
-    constructor(private readonly _foodTagService: FoodTagService) {}
+    constructor(private readonly foodTagService: FoodTagService) {}
 
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
@@ -37,7 +37,7 @@ export class FoodTagController {
         }
         let exist;
         try {
-            exist = await this._foodTagService.findOne({ tagName });
+            exist = await this.foodTagService.findOne({ tagName });
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -48,8 +48,8 @@ export class FoodTagController {
             );
         }
         try {
-            const newFoodTag = await this._foodTagService.createFoodTag(params);
-            return this._foodTagService.map<FoodTag>(newFoodTag);
+            const newFoodTag = await this.foodTagService.createFoodTag(params);
+            return this.foodTagService.map<FoodTag>(newFoodTag);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -60,8 +60,8 @@ export class FoodTagController {
     @ApiOperation(GetOperationId(FoodTag.modelName, 'GetAll'))
     async get(): Promise<FoodTagVm[]> {
         try {
-            const foodTags = await this._foodTagService.findAll();
-            return this._foodTagService.map<FoodTagVm[]>(
+            const foodTags = await this.foodTagService.findAll();
+            return this.foodTagService.map<FoodTagVm[]>(
                 map(foodTags, foodTag => foodTag.toJSON()),
             );
         } catch (e) {
@@ -83,7 +83,7 @@ export class FoodTagController {
             );
         }
 
-        const exist = await this._foodTagService.findById(id);
+        const exist = await this.foodTagService.findById(id);
 
         if (!exist) {
             throw new HttpException(`${id} Not found`, HttpStatus.NOT_FOUND);
@@ -92,8 +92,8 @@ export class FoodTagController {
         exist.tagName = tagName;
 
         try {
-            const updated = await this._foodTagService.update(id, exist);
-            return this._foodTagService.map<FoodTagVm>(updated.toJSON());
+            const updated = await this.foodTagService.update(id, exist);
+            return this.foodTagService.map<FoodTagVm>(updated.toJSON());
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -105,8 +105,8 @@ export class FoodTagController {
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Delete'))
     async delete(@Param('id') id: string): Promise<FoodTagVm> {
         try {
-            const deleted = await this._foodTagService.delete(id);
-            return this._foodTagService.map<FoodTagVm>(deleted.toJSON());
+            const deleted = await this.foodTagService.delete(id);
+            return this.foodTagService.map<FoodTagVm>(deleted.toJSON());
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
