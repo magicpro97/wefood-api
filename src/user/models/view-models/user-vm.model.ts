@@ -8,11 +8,14 @@ export class UserVm extends BaseModelVm {
     @ApiModelProperty()
     username: string;
 
+    @ApiModelProperty()
+    password: string;
+    
     @ApiModelPropertyOptional()
-    firstname?: string;
+    firstName?: string;
 
     @ApiModelPropertyOptional()
-    lastname?: string;
+    lastName?: string;
 
     @ApiModelPropertyOptional()
     fullname?: string;
