@@ -8,10 +8,10 @@ export class UpdateVm {
     id: string;
 
     @ApiModelPropertyOptional()
-    firstname?: string;
+    firstName?: string;
 
     @ApiModelPropertyOptional()
-    lastname?: string;
+    lastName?: string;
 
     @ApiModelPropertyOptional()
     fullname?: string;

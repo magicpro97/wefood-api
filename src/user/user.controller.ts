@@ -28,10 +28,10 @@ export class UserController {
     @ApiResponse({ status: HttpStatus.CREATED, type: UserVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(User.modelName, 'Update'))
-    async update(@Body() userVm: UserVm): Promise<UserVm> {
+    async update(@Body() userVm: UpdateVm): Promise<UserVm> {
         const {
             id,
-            firstName, 
+            firstName,
             address,
             articles,
             dob,
