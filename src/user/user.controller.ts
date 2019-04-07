@@ -6,6 +6,7 @@ import {
     Post,
     Put,
     Get,
+    Query,
 } from '@nestjs/common';
 import { User } from './models/user.model';
 import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger';
@@ -28,7 +29,10 @@ export class UserController {
     @ApiResponse({ status: HttpStatus.CREATED, type: UserVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(User.modelName, 'Update'))
-    async update(@Body() userVm: UpdateVm): Promise<UserVm> {
+    async update(
+        @Body() updateVm: UpdateVm,
+        @Query('renew') renew?: boolean,
+    ): Promise<UserVm> {
         const {
             id,
             firstName,
@@ -43,9 +47,9 @@ export class UserController {
             role,
             sex,
             srcImage,
-        } = userVm;
+        } = updateVm;
 
-        if (!userVm || !id) {
+        if (!updateVm || !id) {
             throw new HttpException(
                 'Missing parameter',
                 HttpStatus.BAD_REQUEST,
@@ -64,10 +68,10 @@ export class UserController {
         exist.sex = sex !== undefined ? sex : exist.sex;
         exist.lastName = lastName !== undefined ? lastName : exist.lastName;
         exist.srcImage = srcImage !== undefined ? srcImage : exist.srcImage;
-        this.handleArray(articles, exist, 'articles');
-        this.handleArray(followers, exist, 'followers');
-        this.handleArray(followings, exist, 'followings');
-        this.handleArray(foodTags, exist, 'foodTags');
+        this.handleArray(articles, exist, 'articles', renew);
+        this.handleArray(followers, exist, 'followers', renew);
+        this.handleArray(followings, exist, 'followings', renew);
+        this.handleArray(foodTags, exist, 'foodTags', renew);
         try {
             const updatedUser = await this.userService.update(id, exist);
             return this.userService.map<UserVm>(updatedUser.toJSON());
@@ -144,15 +148,19 @@ export class UserController {
         return this.userService.login(loginVm);
     }
 
-    handleArray(array: any[], obj: any, field: string): void {
+    handleArray(array: any[], obj: any, field: string, renew?: boolean): void {
         if (array !== undefined) {
             if (Array.isArray(array)) {
                 if (obj[field] !== undefined) {
-                    array.forEach(item => {
-                        if (!array.includes(item)) {
-                            obj[field].push(item);
-                        }
-                    });
+                    if (!renew) {
+                        array.forEach(item => {
+                            if (!obj[field].includes(item)) {
+                                obj[field].push(item);
+                            }
+                        });
+                    } else {
+                        obj[field] = array;
+                    }
                 } else {
                     obj[field] = array;
                 }
