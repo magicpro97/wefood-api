@@ -8,23 +8,61 @@ import {
     Param,
     Body,
     HttpException,
+    UseInterceptors,
+    FileInterceptor,
+    UploadedFile,
+    Req,
+    Res,
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { FoodTag } from './models/food-tag.model';
 import { FoodTagService } from './food-tag.service';
-import { map, isArray } from 'lodash';
+import { map } from 'lodash';
 import { FoodTagVm } from './models/view-models/food-tag-vm.model';
 import { FoodTagParams } from './models/view-models/food-tag-params.model';
 import { GetOperationId } from '../shared/utilities/get-operation-id';
+import { multerOptions } from '../shared/multerOptions';
+import { ApiException } from '../shared/api-exception.model';
 
 @Controller('food-tag')
 @ApiUseTags(FoodTag.modelName)
 export class FoodTagController {
     constructor(private readonly foodTagService: FoodTagService) {}
 
+    @Get('images/:name')
+    async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
+        res.sendFile(name, { root: 'images'});
+    }
+
+    @Post('upload-image')
+    @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async updateImage(
+        @UploadedFile() file: any,
+        @Req() req,
+    ): Promise<FoodTagVm> {
+        if (file) {
+            const exist = await this.foodTagService.findOne({
+                tagName: file.originalname.split('.')[0],
+            });
+            if (exist) {
+                exist.srcImage = `food-tag/images/${file.filename}`;
+                return this.foodTagService.update(exist.id, exist);
+            } else {
+                throw new HttpException(
+                    `${file.originalname} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        } else {
+            throw new HttpException(`file required`, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: FoodTagVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Create'))
     async create(@Body() params: FoodTagParams): Promise<FoodTagVm> {
         const { tagName } = params;
@@ -47,6 +85,7 @@ export class FoodTagController {
                 HttpStatus.BAD_REQUEST,
             );
         }
+
         try {
             const newFoodTag = await this.foodTagService.createFoodTag(params);
             return this.foodTagService.map<FoodTag>(newFoodTag);
@@ -57,7 +96,7 @@ export class FoodTagController {
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: FoodTagVm, isArray: true })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: FoodTagVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'GetAll'))
     async get(): Promise<FoodTagVm[]> {
         try {
@@ -72,7 +111,7 @@ export class FoodTagController {
 
     @Put()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: FoodTagVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Update'))
     async update(@Body() vm: FoodTagVm): Promise<FoodTagVm> {
         const { id, tagName } = vm;
@@ -102,7 +141,7 @@ export class FoodTagController {
 
     @Delete(':id')
     @ApiResponse({ status: HttpStatus.OK, type: FoodTagVm })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: FoodTagVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Delete'))
     async delete(@Param('id') id: string): Promise<FoodTagVm> {
         try {
