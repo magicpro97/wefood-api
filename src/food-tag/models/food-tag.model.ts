@@ -6,6 +6,9 @@ export class FoodTag extends BaseModel<FoodTag> {
     @prop({ required: [true, 'Content is required'], unique: true })
     tagName: string;
 
+    @prop()
+    srcImage?: string;
+
     static get model(): ModelType<FoodTag> {
         return new FoodTag().getModelForClass(FoodTag, { schemaOptions });
     }
