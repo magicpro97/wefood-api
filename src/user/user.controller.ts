@@ -31,7 +31,7 @@ export class UserController {
     @ApiOperation(GetOperationId(User.modelName, 'Update'))
     async update(
         @Body() updateVm: UpdateVm,
-        @Query('renew') renew?: boolean,
+        @Query('renew') renew?: string,
     ): Promise<UserVm> {
         const {
             id,
@@ -148,11 +148,11 @@ export class UserController {
         return this.userService.login(loginVm);
     }
 
-    handleArray(array: any[], obj: any, field: string, renew?: boolean): void {
-        if (array !== undefined) {
+    handleArray(array: any[], obj: any, field: string, renew: string): void {
+        if (array) {
             if (Array.isArray(array)) {
-                if (obj[field] !== undefined) {
-                    if (!renew) {
+                if (obj[field]) {
+                    if (renew === 'false') {
                         array.forEach(item => {
                             if (!obj[field].includes(item)) {
                                 obj[field].push(item);
