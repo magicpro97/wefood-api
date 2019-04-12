@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
 import { FoodTagParams } from './models/view-models/food-tag-params.model';
-
+import { unlink } from 'fs';
 @Injectable()
 export class FoodTagService extends BaseService<FoodTag> {
     constructor(
@@ -31,5 +31,14 @@ export class FoodTagService extends BaseService<FoodTag> {
         } catch (error) {
             throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    async deleteImageFile(path: string) {
+        const imagePath = '.' + path.substring(path.indexOf('/'), path.length);
+        unlink(imagePath, err => {
+            if (err) {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        });
     }
 }

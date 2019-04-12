@@ -31,7 +31,7 @@ export class FoodTagController {
 
     @Get('images/:name')
     async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
-        res.sendFile(name, { root: 'images'});
+        res.sendFile(name, { root: 'images' });
     }
 
     @Post('upload-image')
@@ -63,6 +63,10 @@ export class FoodTagController {
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Create'))
     async create(@Body() params: FoodTagParams): Promise<FoodTagVm> {
         const { tagName } = params;
@@ -96,7 +100,10 @@ export class FoodTagController {
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: FoodTagVm, isArray: true })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'GetAll'))
     async get(): Promise<FoodTagVm[]> {
         try {
@@ -112,6 +119,11 @@ export class FoodTagController {
     @Put()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Update'))
     async update(@Body() vm: FoodTagVm): Promise<FoodTagVm> {
         const { id, tagName } = vm;
@@ -142,11 +154,24 @@ export class FoodTagController {
     @Delete(':id')
     @ApiResponse({ status: HttpStatus.OK, type: FoodTagVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Delete'))
     async delete(@Param('id') id: string): Promise<FoodTagVm> {
         try {
-            const deleted = await this.foodTagService.delete(id);
-            return this.foodTagService.map<FoodTagVm>(deleted.toJSON());
+            const exist = await this.foodTagService.findById(id);
+            if (exist && exist.srcImage) {
+                this.foodTagService.deleteImageFile(exist.srcImage);
+                const deleted = await this.foodTagService.delete(id);
+                return this.foodTagService.map<FoodTagVm>(deleted.toJSON());
+            } else {
+                throw new HttpException(
+                    'Image is not exist',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
