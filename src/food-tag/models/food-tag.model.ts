@@ -3,7 +3,7 @@ import { prop, ModelType } from 'typegoose';
 import { schemaOptions } from '../../shared/base.model';
 
 export class FoodTag extends BaseModel<FoodTag> {
-    @prop({ required: [true, 'Content is required'], unique: true })
+    @prop({ required: [true, 'tagName is required'], unique: true })
     tagName: string;
 
     @prop()

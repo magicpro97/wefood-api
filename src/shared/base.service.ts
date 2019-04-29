@@ -1,5 +1,5 @@
-import {Types} from 'mongoose';
-import {InstanceType, ModelType, Typegoose} from 'typegoose';
+import { Types } from 'mongoose';
+import { InstanceType, ModelType, Typegoose } from 'typegoose';
 
 export class BaseService<T extends Typegoose> {
     protected model: ModelType<T>;
@@ -53,7 +53,7 @@ export class BaseService<T extends Typegoose> {
 
     async update(id: string, item: InstanceType<T>): Promise<InstanceType<T>> {
         return this.model
-            .findByIdAndUpdate(this.toObjectId(id), item, {new: true})
+            .findByIdAndUpdate(this.toObjectId(id), item, { new: true })
             .exec();
     }
 
@@ -64,4 +64,9 @@ export class BaseService<T extends Typegoose> {
     private toObjectId(id: string): Types.ObjectId {
         return Types.ObjectId(id);
     }
+
+    // async getAllId(): Promise<Array<InstanceType<T>>> {
+    //     const obj = await this.findAll();
+    //     return obj.map(value => value.id);
+    // }
 }
