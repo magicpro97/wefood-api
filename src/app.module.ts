@@ -7,6 +7,7 @@ import {ConfigurationService} from './shared/configuration/configuration.service
 import {Configuration} from './shared/configuration/configuration.enum';
 import {UserModule} from './user/user.module';
 import { FoodTagModule } from './food-tag/food-tag.module';
+import { FoodPostModule } from './food-post/food-post.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { FoodTagModule } from './food-tag/food-tag.module';
         }),
         UserModule,
         FoodTagModule,
+        FoodPostModule,
     ],
     controllers: [AppController],
     providers: [AppService],
