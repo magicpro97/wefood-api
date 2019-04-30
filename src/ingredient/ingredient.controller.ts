@@ -8,6 +8,11 @@ import {
     Delete,
     Param,
     Put,
+    UseInterceptors,
+    FileInterceptor,
+    UploadedFile,
+    Req,
+    Res,
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { Ingredient } from './models/ingredient.model';
@@ -17,6 +22,7 @@ import { IngredientParams } from './models/view-models/ingredient-params.model';
 import { ApiException } from 'src/shared/api-exception.model';
 import { GetOperationId } from 'src/shared/utilities/get-operation-id';
 import { map } from 'lodash';
+import { multerOptions } from 'src/shared/multerOptions';
 
 @Controller('ingredient')
 @ApiUseTags(Ingredient.modelName)
@@ -42,7 +48,7 @@ export class IngredientController {
         }
         let exist;
         try {
-            exist = await this.ingredientService.findOne({ingredientName});
+            exist = await this.ingredientService.findOne({ ingredientName });
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -53,10 +59,43 @@ export class IngredientController {
             );
         }
         try {
-            const newIngredient = await this.ingredientService.createIngredient(params);
+            const newIngredient = await this.ingredientService.createIngredient(
+                params,
+            );
             return this.ingredientService.map<Ingredient>(newIngredient);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('images/:name')
+    async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
+        res.sendFile(name, { root: 'images' });
+    }
+
+    @Post('upload-image')
+    @ApiResponse({ status: HttpStatus.CREATED, type: IngredientVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async updateImage(
+        @UploadedFile() file: any,
+        @Req() req,
+    ): Promise<IngredientVm> {
+        if (file) {
+            const exist = await this.ingredientService.findOne({
+                tagName: file.originalname.split('.')[0],
+            });
+            if (exist) {
+                exist.srcImage = `ingredient/images/${file.filename}`;
+                return this.ingredientService.update(exist.id, exist);
+            } else {
+                throw new HttpException(
+                    `${file.originalname} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        } else {
+            throw new HttpException(`file required`, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -89,7 +128,8 @@ export class IngredientController {
     async delete(@Param('id') id: string): Promise<IngredientVm> {
         try {
             const exist = await this.ingredientService.findById(id);
-            if (exist) {
+            if (exist && exist.srcImage) {
+                this.ingredientService.deleteImageFile(exist.srcImage);
                 const deleted = await this.ingredientService.delete(id);
                 return this.ingredientService.map<IngredientVm>(
                     deleted.toJSON(),
