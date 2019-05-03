@@ -1,13 +1,14 @@
-import {Module} from '@nestjs/common';
-import {MongooseModule} from '@nestjs/mongoose';
-import {AppController} from './app.controller';
-import {AppService} from './app.service';
-import {SharedModule} from './shared/shared.module';
-import {ConfigurationService} from './shared/configuration/configuration.service';
-import {Configuration} from './shared/configuration/configuration.enum';
-import {UserModule} from './user/user.module';
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SharedModule } from './shared/shared.module';
+import { ConfigurationService } from './shared/configuration/configuration.service';
+import { Configuration } from './shared/configuration/configuration.enum';
+import { UserModule } from './user/user.module';
 import { FoodTagModule } from './food-tag/food-tag.module';
 import { UnitModule } from 'src/unit/unit.module';
+import { IngredientModule } from './ingredient/ingredient.module';
 
 @Module({
     imports: [
@@ -18,7 +19,8 @@ import { UnitModule } from 'src/unit/unit.module';
         UserModule,
         FoodTagModule,
         UnitModule,
-    ],
+        IngredientModule,
+        ],
     controllers: [AppController],
     providers: [AppService],
 })

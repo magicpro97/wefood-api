@@ -1,5 +1,5 @@
 import 'automapper-ts/dist/automapper';
-import {Injectable} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MapperService {
@@ -11,12 +11,31 @@ export class MapperService {
     }
 
     private static configure(config: AutoMapperJs.IConfiguration): void {
-        config.createMap('User', 'UserVm')
+        config
+            .createMap('User', 'UserVm')
             .forSourceMember('_id', opts => opts.ignore())
             .forSourceMember('password', opts => opts.ignore());
 
-            config.createMap('FoodTag', 'FoodTagVm').forSourceMember('_id', opts => opts.ignore());
-            config.createMap('FoodTag[]', 'FoodTagVm[]').forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('FoodTag', 'FoodTagVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('FoodTag[]', 'FoodTagVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Ingredient', 'IngredientVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('Ingredient[]', 'IngredientVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Unit', 'UnitVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('Unit[]', 'UnitVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {
