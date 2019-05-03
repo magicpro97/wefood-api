@@ -31,13 +31,4 @@ export class IngredientService extends BaseService<Ingredient> {
             throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    async deleteImageFile(path: string) {
-        const imagePath = '.' + path.substring(path.indexOf('/'), path.length);
-        unlink(imagePath, err => {
-            if (err) {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        });
-    }
 }

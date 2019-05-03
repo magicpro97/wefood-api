@@ -19,7 +19,6 @@ export class MapperService {
         config
             .createMap('FoodTag', 'FoodTagVm')
             .forSourceMember('_id', opts => opts.ignore());
-
         config
             .createMap('FoodTag[]', 'FoodTagVm[]')
             .forSourceMember('_id', opts => opts.ignore());
@@ -27,14 +26,13 @@ export class MapperService {
         config
             .createMap('Ingredient', 'IngredientVm')
             .forSourceMember('_id', opts => opts.ignore());
-
         config
             .createMap('Ingredient[]', 'IngredientVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
         config
             .createMap('Unit', 'UnitVm')
             .forSourceMember('_id', opts => opts.ignore());
-
         config
             .createMap('Unit[]', 'UnitVm[]')
             .forSourceMember('_id', opts => opts.ignore());

@@ -63,6 +63,29 @@ export class IngredientController {
         }
     }
 
+    @Get(':id')
+    @ApiResponse({ status: HttpStatus.OK, type: IngredientVm, isArray: true })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetById'))
+    async getById(@Param('id') id: string): Promise<IngredientVm> {
+        try {
+            const exist = await this.ingredientService.findById(id);
+            if (exist) {
+                return this.ingredientService.map<IngredientVm>(exist.toJSON());
+            } else {
+                throw new HttpException(
+                    `${id} is not exists`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        } catch (e) {
+            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: IngredientVm, isArray: true })
     @ApiResponse({
@@ -97,8 +120,7 @@ export class IngredientController {
     async delete(@Param('id') id: string): Promise<IngredientVm> {
         try {
             const exist = await this.ingredientService.findById(id);
-            if (exist && exist.srcImage) {
-                this.ingredientService.deleteImageFile(exist.srcImage);
+            if (exist) {
                 const deleted = await this.ingredientService.delete(id);
                 return this.ingredientService.map<IngredientVm>(
                     deleted.toJSON(),
