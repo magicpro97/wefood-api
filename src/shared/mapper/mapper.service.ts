@@ -36,6 +36,13 @@ export class MapperService {
         config
             .createMap('Unit[]', 'UnitVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Step', 'StepVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('Step[]', 'StepVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {

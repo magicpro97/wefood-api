@@ -1,6 +1,5 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { Unit } from './models/unit.model';
-import { model } from 'mongoose';
 import { Module } from '@nestjs/common';
 import { UnitController } from './unit.controller';
 import { UnitService } from './unit.service';

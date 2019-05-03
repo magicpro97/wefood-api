@@ -4,7 +4,6 @@ import { Ingredient } from './models/ingredient.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
-import { unlink } from 'fs';
 import { IngredientParams } from './models/view-models/ingredient-params.model';
 @Injectable()
 export class IngredientService extends BaseService<Ingredient> {
