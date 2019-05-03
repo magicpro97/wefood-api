@@ -13,6 +13,7 @@ import { StepModule } from './step/step.module';
 import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.module';
 import { CommentModule } from './comment/comment.module';
 import { FoodPostModule } from './food-post/food-post.module';
+import { RatingModule } from './rating/rating.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { FoodPostModule } from './food-post/food-post.module';
         IngredientDetailModule,
         CommentModule,
         FoodPostModule,
+        RatingModule,
     ],
     controllers: [AppController],
     providers: [AppService],
