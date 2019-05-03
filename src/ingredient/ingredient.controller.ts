@@ -8,11 +8,7 @@ import {
     Delete,
     Param,
     Put,
-    UseInterceptors,
-    FileInterceptor,
-    UploadedFile,
-    Req,
-    Res,
+    Query,
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { Ingredient } from './models/ingredient.model';
@@ -22,7 +18,6 @@ import { IngredientParams } from './models/view-models/ingredient-params.model';
 import { ApiException } from 'src/shared/api-exception.model';
 import { GetOperationId } from 'src/shared/utilities/get-operation-id';
 import { map } from 'lodash';
-import { multerOptions } from 'src/shared/multerOptions';
 
 @Controller('ingredient')
 @ApiUseTags(Ingredient.modelName)
@@ -68,47 +63,21 @@ export class IngredientController {
         }
     }
 
-    @Get('images/:name')
-    async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
-        res.sendFile(name, { root: 'images' });
-    }
-
-    @Post('upload-image')
-    @ApiResponse({ status: HttpStatus.CREATED, type: IngredientVm })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
-    @UseInterceptors(FileInterceptor('file', multerOptions))
-    async updateImage(
-        @UploadedFile() file: any,
-        @Req() req,
-    ): Promise<IngredientVm> {
-        if (file) {
-            const exist = await this.ingredientService.findOne({
-                tagName: file.originalname.split('.')[0],
-            });
-            if (exist) {
-                exist.srcImage = `ingredient/images/${file.filename}`;
-                return this.ingredientService.update(exist.id, exist);
-            } else {
-                throw new HttpException(
-                    `${file.originalname} is not exist`,
-                    HttpStatus.BAD_REQUEST,
-                );
-            }
-        } else {
-            throw new HttpException(`file required`, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: IngredientVm, isArray: true })
     @ApiResponse({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         type: ApiException,
     })
-    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetAll'))
-    async get(): Promise<IngredientVm[]> {
+    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetByName'))
+    async getByName(@Query('name') name: string): Promise<IngredientVm[]> {
         try {
-            const ingredients = await this.ingredientService.findAll();
+            if (!name) {
+                name = '';
+            }
+            const ingredients = await this.ingredientService.findAll({
+                ingredientName: { $regex: name },
+            });
             return this.ingredientService.map<IngredientVm[]>(
                 map(ingredients, ingredient => ingredient.toJSON()),
             );

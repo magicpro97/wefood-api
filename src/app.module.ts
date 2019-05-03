@@ -20,7 +20,7 @@ import { IngredientModule } from './ingredient/ingredient.module';
         FoodTagModule,
         UnitModule,
         IngredientModule,
-    ],
+        ],
     controllers: [AppController],
     providers: [AppService],
 })
