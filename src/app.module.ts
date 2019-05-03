@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { FoodTagModule } from './food-tag/food-tag.module';
 import { UnitModule } from 'src/unit/unit.module';
 import { IngredientModule } from './ingredient/ingredient.module';
+import { StepModule } from './step/step.module';
 
 @Module({
     imports: [
@@ -20,7 +21,8 @@ import { IngredientModule } from './ingredient/ingredient.module';
         FoodTagModule,
         UnitModule,
         IngredientModule,
-        ],
+        StepModule,
+    ],
     controllers: [AppController],
     providers: [AppService],
 })
