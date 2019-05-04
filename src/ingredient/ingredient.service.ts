@@ -10,15 +10,13 @@ import { IngredientVm } from './models/view-models/ingredient-vm.model';
 @Injectable()
 export class IngredientService extends BaseService<Ingredient> {
     async updateIngredient(vm: IngredientVm): Promise<Ingredient> {
-        const { name, unitId, srcImage } = vm;
+        const { name, srcImage } = vm;
         const existingIngredient = await this.findById(vm.id);
 
         if (name) {
             existingIngredient.name = name;
         }
-        if (unitId) {
-            existingIngredient.unitId = unitId;
-        }
+
         if (srcImage) {
             existingIngredient.srcImage = srcImage;
         }
@@ -37,12 +35,14 @@ export class IngredientService extends BaseService<Ingredient> {
     }
 
     async createIngredient(params: IngredientParams): Promise<Ingredient> {
-        const { name, unitId, srcImage } = params;
+        const { name, srcImage, isApproved } = params;
         const newIngredient = new this.model();
 
         newIngredient.name = name;
-        newIngredient.unitId = unitId;
-        newIngredient.srcImage = srcImage;
+        if (srcImage) {
+            newIngredient.srcImage = srcImage;
+        }
+        newIngredient.isApproved = isApproved;
         try {
             const result = await this.create(newIngredient);
             return result.toJSON() as Ingredient;

@@ -5,5 +5,8 @@ export class IngredientDetailParams {
     ingredientId: string;
 
     @ApiModelProperty()
+    unitId: string;
+
+    @ApiModelProperty()
     quantity: number;
 }

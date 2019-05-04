@@ -33,22 +33,15 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'Create'))
     async create(@Body() params: IngredientParams): Promise<IngredientVm> {
-        const { name, unitId } = params;
+        const { name } = params;
 
         if (!name) {
             throw new HttpException('Name is required', HttpStatus.BAD_REQUEST);
-        }
-        if (!unitId) {
-            throw new HttpException(
-                'unitId is required',
-                HttpStatus.BAD_REQUEST,
-            );
         }
 
         try {
             const existingIngredient = await this.ingredientService.findOne({
                 name,
-                unitId,
             });
             if (existingIngredient) {
                 throw new HttpException(
@@ -94,14 +87,25 @@ export class IngredientController {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         type: ApiException,
     })
-    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetByName'))
-    async getByName(@Query('name') name: string): Promise<IngredientVm[]> {
+    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetOne'))
+    async getByName(
+        @Query('name') name: string,
+        @Query('isApproved') isApproved: any,
+    ): Promise<IngredientVm[]> {
         try {
             if (!name) {
                 name = '';
             }
+            if (isApproved) {
+                if (isApproved === 'true') {
+                    isApproved = true;
+                } else {
+                    isApproved = false;
+                }
+            }
             const ingredients = await this.ingredientService.findAll({
-                ingredientName: { $regex: name },
+                name: { $regex: name },
+                isApproved,
             });
             return this.ingredientService.map<IngredientVm[]>(
                 map(ingredients, ingredient => ingredient.toJSON()),
@@ -147,7 +151,7 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'update'))
     async update(@Body() vm: IngredientVm): Promise<IngredientVm> {
-        const { id, name, unitId, srcImage } = vm;
+        const { id } = vm;
         try {
             if (!vm || !id) {
                 throw new HttpException(

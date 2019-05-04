@@ -6,5 +6,8 @@ export class IngredientDetailVm extends BaseModelVm {
     ingredientId: string;
 
     @ApiModelProperty()
+    unitId: string;
+
+    @ApiModelProperty()
     quantity: number;
 }

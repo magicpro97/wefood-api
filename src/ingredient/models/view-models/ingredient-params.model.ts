@@ -2,6 +2,6 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class IngredientParams {
     @ApiModelProperty() name: string;
-    @ApiModelProperty() unitId: string;
+    @ApiModelProperty() isApproved?: boolean;
     @ApiModelPropertyOptional() srcImage?: string;
 }
