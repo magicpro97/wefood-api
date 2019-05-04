@@ -18,11 +18,15 @@ import { IngredientParams } from './models/view-models/ingredient-params.model';
 import { ApiException } from 'src/shared/api-exception.model';
 import { GetOperationId } from 'src/shared/utilities/get-operation-id';
 import { map } from 'lodash';
+import { UnitService } from 'src/unit/unit.service';
 
 @Controller('ingredient')
 @ApiUseTags(Ingredient.modelName)
 export class IngredientController {
-    constructor(private readonly ingredientService: IngredientService) {}
+    constructor(
+        private readonly ingredientService: IngredientService,
+        private readonly unitService: UnitService,
+    ) {}
 
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: IngredientVm })
@@ -33,27 +37,36 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'Create'))
     async create(@Body() params: IngredientParams): Promise<IngredientVm> {
-        const { ingredientName } = params;
+        const { name, unitId } = params;
 
-        if (!ingredientName) {
+        if (!name) {
+            throw new HttpException('Name is required', HttpStatus.BAD_REQUEST);
+        }
+        if (!unitId) {
             throw new HttpException(
-                'Ingredient is required',
+                'unitId is required',
                 HttpStatus.BAD_REQUEST,
             );
         }
-        let exist;
+
         try {
-            exist = await this.ingredientService.findOne({ ingredientName });
-        } catch (e) {
-            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if (exist) {
-            throw new HttpException(
-                `${ingredientName} exists`,
-                HttpStatus.BAD_REQUEST,
-            );
-        }
-        try {
+            const existingUnit = await this.unitService.findById(unitId);
+            if (!existingUnit) {
+                throw new HttpException(
+                    `${unitId} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            const existingIngredient = await this.ingredientService.findOne({
+                name,
+                unitId,
+            });
+            if (existingIngredient) {
+                throw new HttpException(
+                    `${name} exists`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
             const newIngredient = await this.ingredientService.createIngredient(
                 params,
             );
@@ -127,7 +140,7 @@ export class IngredientController {
                 );
             } else {
                 throw new HttpException(
-                    'Ingredient is not exist',
+                    `${id} is not exist`,
                     HttpStatus.BAD_REQUEST,
                 );
             }
@@ -145,23 +158,43 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'update'))
     async update(@Body() vm: IngredientVm): Promise<IngredientVm> {
-        const { id, ingredientName } = vm;
-
-        if (!vm || !id) {
-            throw new HttpException(
-                'Missing parameters',
-                HttpStatus.BAD_REQUEST,
-            );
-        }
-
-        const exist = await this.ingredientService.findById(id);
-
-        if (!exist) {
-            throw new HttpException(`${id} Not found`, HttpStatus.NOT_FOUND);
-        }
-        exist.ingredientName = ingredientName;
+        const { id, name, unitId, srcImage } = vm;
         try {
-            const updated = await this.ingredientService.update(id, exist);
+            if (!vm || !id) {
+                throw new HttpException(
+                    'Missing parameters',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            const existingIngredient = await this.ingredientService.findById(
+                id,
+            );
+            if (!existingIngredient) {
+                throw new HttpException(
+                    `${id} Not found`,
+                    HttpStatus.NOT_FOUND,
+                );
+            }
+            existingIngredient.name = name;
+
+            if (unitId) {
+                const existingUnit = await this.unitService.findById(id);
+                if (!existingUnit) {
+                    throw new HttpException(
+                        'Missing parameters',
+                        HttpStatus.BAD_REQUEST,
+                    );
+                }
+                existingIngredient.unitId = unitId;
+            }
+
+            if (srcImage) {
+                existingIngredient.srcImage = srcImage;
+            }
+            const updated = await this.ingredientService.update(
+                id,
+                existingIngredient,
+            );
             return this.ingredientService.map<IngredientVm>(updated.toJSON());
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);

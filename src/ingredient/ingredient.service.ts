@@ -18,13 +18,15 @@ export class IngredientService extends BaseService<Ingredient> {
     }
 
     async createIngredient(params: IngredientParams): Promise<Ingredient> {
-        const { ingredientName } = params;
+        const { name, unitId, srcImage } = params;
 
-        const newingredient = new this.model();
+        const newIngredient = new this.model();
 
-        newingredient.ingredientName = ingredientName;
+        newIngredient.name = name;
+        newIngredient.unitId = unitId;
+        newIngredient.srcImage = srcImage;
         try {
-            const result = await this.create(newingredient);
+            const result = await this.create(newIngredient);
             return result.toJSON() as Ingredient;
         } catch (error) {
             throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);

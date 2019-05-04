@@ -3,11 +3,15 @@ import { prop, ModelType } from 'typegoose';
 import { schemaOptions } from '../../shared/base.model';
 
 export class Ingredient extends BaseModel<Ingredient> {
-    @prop({ required: [true, 'Content is required'], unique: true })
-    ingredientName: string;
+    @prop({ required: [true, 'name is required'], unique: true })
+    name: string;
+
+    @prop({ required: [true, 'unitId is required'], unique: true })
+    unitId: string;
 
     @prop()
     srcImage?: string;
+
     static get model(): ModelType<Ingredient> {
         return new Ingredient().getModelForClass(Ingredient, { schemaOptions });
     }
