@@ -12,6 +12,7 @@ import { IngredientModule } from './ingredient/ingredient.module';
 import { StepModule } from './step/step.module';
 import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.module';
 import { CommentModule } from './comment/comment.module';
+import { FoodPostModule } from './food-post/food-post.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { CommentModule } from './comment/comment.module';
         StepModule,
         IngredientDetailModule,
         CommentModule,
+        FoodPostModule,
     ],
     controllers: [AppController],
     providers: [AppService],

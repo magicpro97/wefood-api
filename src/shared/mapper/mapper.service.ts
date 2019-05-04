@@ -57,6 +57,13 @@ export class MapperService {
         config
             .createMap('Comment[]', 'CommentVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('FoodPost', 'FoodPostVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('FoodPost[]', 'FoodPostVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {

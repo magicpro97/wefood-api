@@ -12,5 +12,6 @@ import { FoodTag } from './models/food-tag.model';
     ],
     controllers: [FoodTagController],
     providers: [FoodTagService],
+    exports: [FoodTagService],
 })
 export class FoodTagModule {}

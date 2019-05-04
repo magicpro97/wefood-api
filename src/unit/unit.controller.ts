@@ -13,8 +13,8 @@ import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { Unit } from './models/unit.model';
 import { UnitService } from './unit.service';
 import { UnitVm } from './models/view-models/unit-vm.model';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { ApiException } from '../shared/api-exception.model';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { UnitParams } from './models/view-models/unit-params.model';
 import { map } from 'lodash';
 
