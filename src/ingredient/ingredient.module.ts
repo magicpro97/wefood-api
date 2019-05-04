@@ -1,4 +1,4 @@
-import { MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, InjectModel } from '@nestjs/mongoose';
 import { Ingredient } from './models/ingredient.model';
 import { Module } from '@nestjs/common';
 import { IngredientController } from './ingredient.controller';

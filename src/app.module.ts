@@ -10,6 +10,7 @@ import { FoodTagModule } from './food-tag/food-tag.module';
 import { UnitModule } from 'src/unit/unit.module';
 import { IngredientModule } from './ingredient/ingredient.module';
 import { StepModule } from './step/step.module';
+import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { StepModule } from './step/step.module';
         UnitModule,
         IngredientModule,
         StepModule,
+        IngredientDetailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

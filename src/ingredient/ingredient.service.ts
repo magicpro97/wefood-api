@@ -5,8 +5,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
 import { IngredientParams } from './models/view-models/ingredient-params.model';
+import { IngredientVm } from './models/view-models/ingredient-vm.model';
+
 @Injectable()
 export class IngredientService extends BaseService<Ingredient> {
+    async updateIngredient(vm: IngredientVm): Promise<Ingredient> {
+        const { name, unitId, srcImage } = vm;
+        const existingIngredient = await this.findById(vm.id);
+
+        if (name) {
+            existingIngredient.name = name;
+        }
+        if (unitId) {
+            existingIngredient.unitId = unitId;
+        }
+        if (srcImage) {
+            existingIngredient.srcImage = srcImage;
+        }
+        const updated = await this.update(vm.id, existingIngredient);
+        return updated.toJSON() as Ingredient;
+    }
+
     constructor(
         @InjectModel(Ingredient.modelName)
         private readonly ingredientModel: ModelType<Ingredient>,
@@ -19,7 +38,6 @@ export class IngredientService extends BaseService<Ingredient> {
 
     async createIngredient(params: IngredientParams): Promise<Ingredient> {
         const { name, unitId, srcImage } = params;
-
         const newIngredient = new this.model();
 
         newIngredient.name = name;
