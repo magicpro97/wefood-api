@@ -6,9 +6,6 @@ export class Ingredient extends BaseModel<Ingredient> {
     @prop({ required: [true, 'name is required'], unique: true })
     name: string;
 
-    @prop({ required: [true, 'unitId is required'], unique: true })
-    unitId: string;
-
     @prop()
     srcImage?: string;
 

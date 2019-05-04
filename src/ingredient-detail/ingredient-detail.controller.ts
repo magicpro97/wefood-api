@@ -66,7 +66,27 @@ export class IngredientDetailController {
         @Body() params: IngredientDetailParams,
     ): Promise<IngredientDetailVm> {
         try {
-            const { ingredientId } = params;
+            const { ingredientId, unitId, quantity } = params;
+            if (!ingredientId) {
+                throw new HttpException(
+                    'ingredientId is required',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+
+            if (!unitId) {
+                throw new HttpException(
+                    'unitId is required',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+
+            if (!quantity) {
+                throw new HttpException(
+                    'quantity is required',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
             const result = await this.ingredientDetailService.createIngredientDetail(
                 params,
             );

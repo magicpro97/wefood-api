@@ -5,6 +5,9 @@ export class IngredientDetail extends BaseModel<IngredientDetail> {
     @prop({ required: [true, 'ingredientId is required'] })
     ingredientId: string;
 
+    @prop({ required: [true, 'unitId is required'] })
+    unitId: string;
+
     @prop({ required: [true, 'quantity is required'] })
     quantity: number;
 

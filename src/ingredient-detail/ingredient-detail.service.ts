@@ -33,9 +33,10 @@ export class IngredientDetailService extends BaseService<IngredientDetail> {
     async createIngredientDetail(
         params: IngredientDetailParams,
     ): Promise<IngredientDetail> {
-        const { ingredientId, quantity } = params;
+        const { ingredientId, unitId, quantity } = params;
         const newIngredientDetail = new this.model();
         newIngredientDetail.ingredientId = ingredientId;
+        newIngredientDetail.unitId = unitId;
         newIngredientDetail.quantity = quantity;
         try {
             const result = await this.create(newIngredientDetail);

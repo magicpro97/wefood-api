@@ -3,6 +3,5 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class IngredientVm extends BaseModelVm {
     @ApiModelProperty() name: string;
-    @ApiModelProperty() unitId: string;
     @ApiModelPropertyOptional() srcImage?: string;
 }
