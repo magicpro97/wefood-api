@@ -18,15 +18,11 @@ import { IngredientParams } from './models/view-models/ingredient-params.model';
 import { ApiException } from 'src/shared/api-exception.model';
 import { GetOperationId } from 'src/shared/utilities/get-operation-id';
 import { map } from 'lodash';
-import { UnitService } from 'src/unit/unit.service';
 
 @Controller('ingredient')
 @ApiUseTags(Ingredient.modelName)
 export class IngredientController {
-    constructor(
-        private readonly ingredientService: IngredientService,
-        private readonly unitService: UnitService,
-    ) {}
+    constructor(private readonly ingredientService: IngredientService) {}
 
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: IngredientVm })
@@ -50,13 +46,6 @@ export class IngredientController {
         }
 
         try {
-            const existingUnit = await this.unitService.findById(unitId);
-            if (!existingUnit) {
-                throw new HttpException(
-                    `${unitId} is not exist`,
-                    HttpStatus.BAD_REQUEST,
-                );
-            }
             const existingIngredient = await this.ingredientService.findOne({
                 name,
                 unitId,
@@ -175,27 +164,9 @@ export class IngredientController {
                     HttpStatus.NOT_FOUND,
                 );
             }
-            existingIngredient.name = name;
 
-            if (unitId) {
-                const existingUnit = await this.unitService.findById(id);
-                if (!existingUnit) {
-                    throw new HttpException(
-                        'Missing parameters',
-                        HttpStatus.BAD_REQUEST,
-                    );
-                }
-                existingIngredient.unitId = unitId;
-            }
-
-            if (srcImage) {
-                existingIngredient.srcImage = srcImage;
-            }
-            const updated = await this.ingredientService.update(
-                id,
-                existingIngredient,
-            );
-            return this.ingredientService.map<IngredientVm>(updated.toJSON());
+            const updated = await this.ingredientService.updateIngredient(vm);
+            return this.ingredientService.map<IngredientVm>(updated);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }

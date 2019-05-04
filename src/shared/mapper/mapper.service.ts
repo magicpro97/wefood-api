@@ -43,6 +43,13 @@ export class MapperService {
         config
             .createMap('Step[]', 'StepVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('IngredientDetail', 'IngredientDetailVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('IngredientDetail[]', 'IngredientDetailVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {

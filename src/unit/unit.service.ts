@@ -10,11 +10,11 @@ import { UnitParams } from './models/view-models/unit-params.model';
 export class UnitService extends BaseService<Unit> {
     constructor(
         @InjectModel(Unit.modelName)
-        private readonly UnitModel: ModelType<Unit>,
+        private readonly unitModel: ModelType<Unit>,
         private readonly mapperService: MapperService,
     ) {
         super();
-        this.model = UnitModel;
+        this.model = unitModel;
         this.mapper = mapperService.mapper;
     }
 
