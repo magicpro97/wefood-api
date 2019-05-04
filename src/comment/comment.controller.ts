@@ -14,8 +14,8 @@ import { Comment } from './models/comment.model';
 import { CommentService } from './comment.service';
 import { CommentVm } from './models/view-models/comment-vm.model';
 import { CommentParams } from './models/view-models/comment-params.model';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { ApiException } from '../shared/api-exception.model';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 
 @Controller('comment')
 @ApiUseTags(Comment.modelName)

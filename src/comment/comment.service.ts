@@ -3,7 +3,7 @@ import { BaseService } from '../shared/base.service';
 import { Comment } from './models/comment.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
-import { MapperService } from 'src/shared/mapper/mapper.service';
+import { MapperService } from '../shared/mapper/mapper.service';
 import { CommentParams } from './models/view-models/comment-params.model';
 
 @Injectable()

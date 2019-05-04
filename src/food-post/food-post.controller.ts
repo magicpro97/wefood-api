@@ -18,7 +18,7 @@ import { ApiException } from '../shared/api-exception.model';
 import { map } from 'lodash';
 import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { FoodPostPrams } from './models/view-models/food-post-params.model';
-import { FoodTagService } from 'src/food-tag/food-tag.service';
+import { FoodTagService } from '../food-tag/food-tag.service';
 
 @Controller('food-post')
 @ApiUseTags(FoodPost.modelName)

@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { StepVm } from './models/view-models/step-vm.models';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { ApiException } from '../shared/api-exception.model';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { StepService } from './step.service';
 import { Step } from './models/step.model';
 import { map } from 'lodash';

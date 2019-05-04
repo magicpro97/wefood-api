@@ -1,9 +1,9 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { BaseService } from 'src/shared/base.service';
+import { BaseService } from '../shared/base.service';
 import { Unit } from './models/unit.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
-import { MapperService } from 'src/shared/mapper/mapper.service';
+import { MapperService } from '../shared/mapper/mapper.service';
 import { UnitParams } from './models/view-models/unit-params.model';
 
 @Injectable()

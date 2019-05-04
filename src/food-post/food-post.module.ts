@@ -3,7 +3,7 @@ import { FoodPostController } from './food-post.controller';
 import { FoodPostService } from './food-post.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FoodPost } from './models/food-post.model';
-import { FoodTagModule } from 'src/food-tag/food-tag.module';
+import { FoodTagModule } from '../food-tag/food-tag.module';
 
 @Module({
     imports: [

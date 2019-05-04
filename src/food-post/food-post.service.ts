@@ -5,10 +5,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
 import { FoodPostPrams } from './models/view-models/food-post-params.model';
-import { FoodPostVm } from './models/view-models/food-post-vm.model';
-import { ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
 
 @Injectable()
 export class FoodPostService extends BaseService<FoodPost> {
