@@ -9,6 +9,9 @@ export class Ingredient extends BaseModel<Ingredient> {
     @prop()
     srcImage?: string;
 
+    @prop()
+    isApproved: boolean;
+
     static get model(): ModelType<Ingredient> {
         return new Ingredient().getModelForClass(Ingredient, { schemaOptions });
     }

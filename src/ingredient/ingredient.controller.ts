@@ -87,14 +87,25 @@ export class IngredientController {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         type: ApiException,
     })
-    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetByName'))
-    async getByName(@Query('name') name: string): Promise<IngredientVm[]> {
+    @ApiOperation(GetOperationId(Ingredient.modelName, 'GetOne'))
+    async getByName(
+        @Query('name') name: string,
+        @Query('isApproved') isApproved: any,
+    ): Promise<IngredientVm[]> {
         try {
             if (!name) {
                 name = '';
             }
+            if (isApproved) {
+                if (isApproved === 'true') {
+                    isApproved = true;
+                } else {
+                    isApproved = false;
+                }
+            }
             const ingredients = await this.ingredientService.findAll({
-                ingredientName: { $regex: name },
+                name: { $regex: name },
+                isApproved,
             });
             return this.ingredientService.map<IngredientVm[]>(
                 map(ingredients, ingredient => ingredient.toJSON()),
