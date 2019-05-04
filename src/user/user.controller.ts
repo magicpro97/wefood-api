@@ -7,6 +7,7 @@ import {
     Put,
     Get,
     Query,
+    Param,
 } from '@nestjs/common';
 import { User } from './models/user.model';
 import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger';
@@ -83,6 +84,7 @@ export class UserController {
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: UserVm, isArray: true })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UserVm })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: UserVm })
     @ApiOperation(GetOperationId(User.modelName, 'GetAll'))
     async get(): Promise<UserVm[]> {
         try {
@@ -90,6 +92,19 @@ export class UserController {
             return this.userService.map<UserVm[]>(
                 map(users, user => user.toJSON()),
             );
+        } catch (e) {
+            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get(':id')
+    @ApiResponse({ status: HttpStatus.OK, type: UserVm, isArray: true })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UserVm })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: UserVm })
+    async getById(@Param('id') id: string): Promise<UserVm> {
+        try {
+            const user = await this.userService.findById(id);
+            return this.userService.map<UserVm>(user.toJSON());
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
