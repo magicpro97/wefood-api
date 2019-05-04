@@ -50,6 +50,13 @@ export class MapperService {
         config
             .createMap('IngredientDetail[]', 'IngredientDetailVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Comment', 'CommentVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('Comment[]', 'CommentVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {
