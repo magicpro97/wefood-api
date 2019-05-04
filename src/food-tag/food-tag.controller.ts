@@ -8,11 +8,11 @@ import {
     Param,
     Body,
     HttpException,
-    UseInterceptors,
-    FileInterceptor,
-    UploadedFile,
-    Req,
-    Res,
+    // UseInterceptors,
+    // FileInterceptor,
+    // UploadedFile,
+    // Req,
+    // Res,
 } from '@nestjs/common';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { FoodTag } from './models/food-tag.model';
@@ -21,7 +21,7 @@ import { map } from 'lodash';
 import { FoodTagVm } from './models/view-models/food-tag-vm.model';
 import { FoodTagParams } from './models/view-models/food-tag-params.model';
 import { GetOperationId } from '../shared/utilities/get-operation-id';
-import { multerOptions } from '../shared/multerOptions';
+//import { multerOptions } from '../shared/multerOptions';
 import { ApiException } from '../shared/api-exception.model';
 
 @Controller('food-tag')
@@ -29,36 +29,36 @@ import { ApiException } from '../shared/api-exception.model';
 export class FoodTagController {
     constructor(private readonly foodTagService: FoodTagService) {}
 
-    @Get('images/:name')
-    async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
-        res.sendFile(name, { root: 'images' });
-    }
+    // @Get('images/:name')
+    // async downloadImage(@Param('name') name: string, @Res() res): Promise<any> {
+    //     res.sendFile(name, { root: 'images' });
+    // }
 
-    @Post('upload-image')
-    @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
-    @UseInterceptors(FileInterceptor('file', multerOptions))
-    async updateImage(
-        @UploadedFile() file: any,
-        @Req() req,
-    ): Promise<FoodTagVm> {
-        if (file) {
-            const exist = await this.foodTagService.findOne({
-                tagName: file.originalname.split('.')[0],
-            });
-            if (exist) {
-                exist.srcImage = `food-tag/images/${file.filename}`;
-                return this.foodTagService.update(exist.id, exist);
-            } else {
-                throw new HttpException(
-                    `${file.originalname} is not exist`,
-                    HttpStatus.BAD_REQUEST,
-                );
-            }
-        } else {
-            throw new HttpException(`file required`, HttpStatus.BAD_REQUEST);
-        }
-    }
+    // @Post('upload-image')
+    // @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
+    // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    // @UseInterceptors(FileInterceptor('file', multerOptions))
+    // async updateImage(
+    //     @UploadedFile() file: any,
+    //     @Req() req,
+    // ): Promise<FoodTagVm> {
+    //     if (file) {
+    //         const exist = await this.foodTagService.findOne({
+    //             tagName: file.originalname.split('.')[0],
+    //         });
+    //         if (exist) {
+    //             exist.srcImage = `food-tag/images/${file.filename}`;
+    //             return this.foodTagService.update(exist.id, exist);
+    //         } else {
+    //             throw new HttpException(
+    //                 `${file.originalname} is not exist`,
+    //                 HttpStatus.BAD_REQUEST,
+    //             );
+    //         }
+    //     } else {
+    //         throw new HttpException(`file required`, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
     @Post()
     @ApiResponse({ status: HttpStatus.CREATED, type: FoodTagVm })
@@ -162,8 +162,7 @@ export class FoodTagController {
     async delete(@Param('id') id: string): Promise<FoodTagVm> {
         try {
             const exist = await this.foodTagService.findById(id);
-            if (exist && exist.srcImage) {
-                this.foodTagService.deleteImageFile(exist.srcImage);
+            if (exist) {
                 const deleted = await this.foodTagService.delete(id);
                 return this.foodTagService.map<FoodTagVm>(deleted.toJSON());
             } else {

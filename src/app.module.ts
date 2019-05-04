@@ -11,6 +11,7 @@ import { UnitModule } from 'src/unit/unit.module';
 import { IngredientModule } from './ingredient/ingredient.module';
 import { StepModule } from './step/step.module';
 import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.mo
         IngredientModule,
         StepModule,
         IngredientDetailModule,
+        CommentModule,
     ],
     controllers: [AppController],
     providers: [AppService],
