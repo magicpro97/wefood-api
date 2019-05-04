@@ -7,7 +7,7 @@ import { ConfigurationService } from './shared/configuration/configuration.servi
 import { Configuration } from './shared/configuration/configuration.enum';
 import { UserModule } from './user/user.module';
 import { FoodTagModule } from './food-tag/food-tag.module';
-import { UnitModule } from 'src/unit/unit.module';
+import { UnitModule } from './unit/unit.module';
 import { IngredientModule } from './ingredient/ingredient.module';
 import { StepModule } from './step/step.module';
 import { IngredientDetailModule } from './ingredient-detail/ingredient-detail.module';

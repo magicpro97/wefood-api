@@ -11,12 +11,11 @@ import {
 } from '@nestjs/common';
 import { IngredientDetail } from './models/ingredient-detail.models';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { ApiException } from 'src/shared/api-exception.model';
+import { ApiException } from '../shared/api-exception.model';
 import { IngredientDetailVm } from './models/view-models/ingredient-detail-vm.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { IngredientDetailService } from './ingredient-detail.service';
 import { IngredientDetailParams } from './models/view-models/ingredient-detail-params.model';
-import { IngredientService } from 'src/ingredient/ingredient.service';
 
 @Controller('ingredient-detail')
 @ApiUseTags(IngredientDetail.modelName)
