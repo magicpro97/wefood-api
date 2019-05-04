@@ -15,8 +15,8 @@ import { Ingredient } from './models/ingredient.model';
 import { IngredientService } from './ingredient.service';
 import { IngredientVm } from './models/view-models/ingredient-vm.model';
 import { IngredientParams } from './models/view-models/ingredient-params.model';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { ApiException } from '../shared/api-exception.model';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { map } from 'lodash';
 
 @Controller('ingredient')
