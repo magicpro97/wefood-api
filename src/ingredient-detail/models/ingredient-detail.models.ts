@@ -2,6 +2,9 @@ import { BaseModel, schemaOptions } from '../../shared/base.model';
 import { prop, ModelType } from 'typegoose';
 
 export class IngredientDetail extends BaseModel<IngredientDetail> {
+    @prop({ required: [true, 'postId is required'] })
+    postId: string;
+
     @prop({ required: [true, 'ingredientId is required'] })
     ingredientId: string;
 

@@ -108,7 +108,7 @@ export class StepController {
     })
     @ApiOperation(GetOperationId(Step.modelName, 'Update'))
     async update(@Body() params: StepVm): Promise<StepVm> {
-        const { id, content } = params;
+        const { id, content, no, postId } = params;
 
         if (!params || !id) {
             throw new HttpException(
@@ -122,6 +122,8 @@ export class StepController {
             if (!existingStep) {
                 throw new HttpException(`${id} is not exist`, HttpStatus.BAD_REQUEST);
             }
+            existingStep.postId = postId;
+            existingStep.no = no;
             existingStep.content = content;
             const updatedStep = await this.stepService.update(id, existingStep);
             return this.stepService.map<StepVm>(updatedStep.toJSON());

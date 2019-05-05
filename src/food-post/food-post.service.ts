@@ -4,7 +4,8 @@ import { BaseService } from '../shared/base.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
-import { FoodPostPrams } from './models/view-models/food-post-params.model';
+import { FoodPostModel } from './models/view-models/food-post.model';
+import { FoodPostVm } from './models/view-models/food-post-vm.model';
 
 @Injectable()
 export class FoodPostService extends BaseService<FoodPost> {
@@ -17,30 +18,34 @@ export class FoodPostService extends BaseService<FoodPost> {
         this.model = foodPostModel;
         this.mapper = mapperService.mapper;
     }
-    async createFoodPost(params: FoodPostPrams): Promise<FoodPost> {
+    async createFoodPost(params: FoodPostModel): Promise<FoodPostVm> {
         const {
             userId,
             title,
             description,
             timeEstimate,
-            foodTagIds,
-            stepIds,
-            ingredientDetailId,
             srcImages,
+            foodTagIds,
         } = params;
+        const newFoodPostVm = new FoodPostVm();
+        newFoodPostVm.userId = userId;
+        newFoodPostVm.title = title;
+        newFoodPostVm.description = description;
+        newFoodPostVm.timeEstimate = timeEstimate;
+        newFoodPostVm.srcImages = srcImages;
 
         const newFoodPost = new this.model();
         newFoodPost.userId = userId;
         newFoodPost.title = title;
         newFoodPost.description = description;
         newFoodPost.timeEstimate = timeEstimate;
-        newFoodPost.foodTagIds = foodTagIds;
-        newFoodPost.stepIds = stepIds;
-        newFoodPost.ingredientDetailId = ingredientDetailId;
         newFoodPost.srcImages = srcImages;
+        newFoodPost.foodTagIds = foodTagIds;
+
         try {
             const result = await this.create(newFoodPost);
-            return result.toJSON() as FoodPost;
+            newFoodPostVm.id = result.id;
+            return newFoodPostVm;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -20,6 +20,8 @@ export class StepService extends BaseService<Step> {
 
     async createStep(params: StepParams): Promise<Step> {
         const newStep = new this.model();
+        newStep.postId = params.postId;
+        newStep.no = params.no;
         newStep.content = params.content;
         try {
             const result = await this.create(newStep);

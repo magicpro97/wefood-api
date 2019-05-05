@@ -17,10 +17,6 @@ export class FoodPost extends BaseModel<FoodPost> {
 
     @prop() foodTagIds?: string[];
 
-    @prop() stepIds?: string[];
-
-    @prop() ingredientDetailId?: string[];
-
     @prop() srcImages?: string[];
 
     static get model(): ModelType<FoodPost> {
