@@ -107,6 +107,56 @@ export class FoodPostController {
         }
     }
 
+    @Get(':id')
+    @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm, isArray: true })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiOperation(GetOperationId(FoodPost.modelName, 'GetById'))
+    async getByIdFoodPost(@Param('id') id: string): Promise<FoodPostVm[]> {
+        try {
+            const exist = await this.foodPostService.findById(id);
+            if (!exist) {
+                throw new HttpException(
+                    `${id} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            } else {
+                const foodPostVm = new FoodPostVm();
+                foodPostVm.createAt = exist.createAt;
+                foodPostVm.updateAt = exist.updateAt;
+                foodPostVm.id = id;
+                foodPostVm.userId = exist.userId;
+                foodPostVm.title = exist.title;
+                foodPostVm.description = exist.description;
+                foodPostVm.timeEstimate = exist.timeEstimate;
+                foodPostVm.foodTags = [];
+                for (const foodTagId of exist.foodTagIds) {
+                    foodPostVm.foodTags.push(
+                        await this.foodTagService.findById(foodTagId),
+                    );
+                }
+                foodPostVm.steps = await this.stepService.findAll({
+                    postId: exist.id,
+                });
+                foodPostVm.ingredientDetails = await this.ingredientDetailService.findAll(
+                    {
+                        postId: exist.id,
+                    },
+                );
+                foodPostVm.comments = await this.commentService.findAll({
+                    postId: exist.id,
+                });
+                foodPostVm.srcImages = exist.srcImages;
+                return this.foodPostService.map<FoodPostVm[]>(foodPostVm);
+            }
+        } catch (e) {
+            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Post()
     @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
