@@ -102,6 +102,8 @@ export class IngredientController {
                 } else {
                     isApproved = false;
                 }
+            } else {
+                isApproved = true;
             }
             const ingredients = await this.ingredientService.findAll({
                 name: { $regex: name },

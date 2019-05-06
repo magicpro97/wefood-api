@@ -35,8 +35,21 @@ export class BaseService<T extends Typegoose> {
         return this.model.find(filter).exec();
     }
 
+    async deleteAll(filter = {}): Promise<Array<InstanceType<T>>> {
+        const all = await this.model.find(filter).exec();
+        const allIds = all.map(item => item.id);
+        for (const id of allIds) {
+            await this.model.findByIdAndDelete(id).exec();
+        }
+        return all;
+    }
+
     async findOne(filter = {}): Promise<InstanceType<T>> {
         return this.model.findOne(filter).exec();
+    }
+
+    async findOneAndDelete(filter = {}): Promise<InstanceType<T>> {
+        return this.model.findOneAndDelete(filter).exec();
     }
 
     async findById(id: string): Promise<InstanceType<T>> {
@@ -64,9 +77,4 @@ export class BaseService<T extends Typegoose> {
     private toObjectId(id: string): Types.ObjectId {
         return Types.ObjectId(id);
     }
-
-    // async getAllId(): Promise<Array<InstanceType<T>>> {
-    //     const obj = await this.findAll();
-    //     return obj.map(value => value.id);
-    // }
 }

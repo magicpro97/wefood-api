@@ -10,12 +10,35 @@ import { IngredientDetailVm } from './models/view-models/ingredient-detail-vm.mo
 @Injectable()
 export class IngredientDetailService extends BaseService<IngredientDetail> {
     async updateIngredientDetail(vm: IngredientDetailVm) {
-        const { id, ingredientId, quantity } = vm;
+        const { id, ingredientId, quantity, postId } = vm;
         const existingIngredientDetail = await this.findById(id);
+
+        if (postId) {
+            existingIngredientDetail.postId = postId;
+        } else {
+            throw new HttpException(
+                'postId is required',
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
         if (ingredientId) {
             existingIngredientDetail.ingredientId = ingredientId;
+        } else {
+            throw new HttpException(
+                'ingredientId is required',
+                HttpStatus.BAD_REQUEST,
+            );
         }
-        existingIngredientDetail.quantity = quantity;
+
+        if (quantity) {
+            existingIngredientDetail.quantity = quantity;
+        } else {
+            throw new HttpException(
+                'quantity is required',
+                HttpStatus.BAD_REQUEST,
+            );
+        }
         const updated = await this.update(id, existingIngredientDetail);
         return updated.toJSON() as IngredientDetail;
     }
@@ -33,8 +56,10 @@ export class IngredientDetailService extends BaseService<IngredientDetail> {
     async createIngredientDetail(
         params: IngredientDetailParams,
     ): Promise<IngredientDetail> {
-        const { ingredientId, unitId, quantity } = params;
+        const { ingredientId, unitId, quantity, postId } = params;
         const newIngredientDetail = new this.model();
+
+        newIngredientDetail.postId = postId;
         newIngredientDetail.ingredientId = ingredientId;
         newIngredientDetail.unitId = unitId;
         newIngredientDetail.quantity = quantity;
