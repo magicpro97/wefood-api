@@ -9,8 +9,7 @@ import { IngredientModule } from '../ingredient/ingredient.module';
 import { IngredientDetailModule } from '../ingredient-detail/ingredient-detail.module';
 import { UnitModule } from '../unit/unit.module';
 import { UserModule } from '../user/user.module';
-import { CommentService } from '../comment/comment.service';
-import { CommentModule } from 'src/comment/comment.module';
+import { CommentModule } from '../comment/comment.module';
 
 @Module({
     imports: [

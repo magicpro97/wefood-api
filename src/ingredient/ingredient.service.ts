@@ -37,7 +37,7 @@ export class IngredientService extends BaseService<Ingredient> {
     async createIngredient(params: IngredientParams): Promise<Ingredient> {
         const { name, srcImage, isApproved } = params;
         const newIngredient = new this.model();
-        console.log(1);
+
         newIngredient.name = name;
         if (srcImage) {
             newIngredient.srcImage = srcImage;

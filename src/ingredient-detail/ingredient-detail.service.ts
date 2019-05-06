@@ -17,7 +17,7 @@ export class IngredientDetailService extends BaseService<IngredientDetail> {
             existingIngredientDetail.postId = postId;
         } else {
             throw new HttpException(
-                'postId is requred!',
+                'postId is required',
                 HttpStatus.BAD_REQUEST,
             );
         }
@@ -26,7 +26,7 @@ export class IngredientDetailService extends BaseService<IngredientDetail> {
             existingIngredientDetail.ingredientId = ingredientId;
         } else {
             throw new HttpException(
-                'ingredientId is requred!',
+                'ingredientId is required',
                 HttpStatus.BAD_REQUEST,
             );
         }
@@ -35,7 +35,7 @@ export class IngredientDetailService extends BaseService<IngredientDetail> {
             existingIngredientDetail.quantity = quantity;
         } else {
             throw new HttpException(
-                'quantity is requred!',
+                'quantity is required',
                 HttpStatus.BAD_REQUEST,
             );
         }

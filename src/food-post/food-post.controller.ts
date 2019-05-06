@@ -189,7 +189,7 @@ export class FoodPostController {
                 );
                 for (const ingredientName of ingredientNames) {
                     const exist = await this.ingredientService.findOne({
-                        name,
+                        name: ingredientName,
                     });
                     if (!exist) {
                         const newIngredient = await this.ingredientService.createIngredient(
@@ -246,7 +246,7 @@ export class FoodPostController {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         type: ApiException,
     })
-    @ApiOperation(GetOperationId(FoodPost.modelName, 'CreateNewFoodPost'))
+    @ApiOperation(GetOperationId(FoodPost.modelName, 'UpdateFoodPost'))
     async updateFoodPost(@Body() params: FoodPostPrams): Promise<FoodPostVm> {
         const {
             id,
@@ -263,6 +263,7 @@ export class FoodPostController {
         const newTagIds: string[] = [];
         const newIngredients: IngredientVm[] = [];
         const newIngredientDetails: IngredientDetailVm[] = [];
+        const updatedFoodPostVm = new FoodPostVm();
 
         if (!id) {
             throw new HttpException('id is required', HttpStatus.BAD_REQUEST);
@@ -291,6 +292,12 @@ export class FoodPostController {
             );
         }
 
+        existFoodPost.userId = userId;
+        existFoodPost.title = title;
+        existFoodPost.description = description;
+        existFoodPost.timeEstimate = timeEstimate;
+        existFoodPost.srcImages = srcImages;
+
         if (tagNames) {
             for (const tagName of tagNames) {
                 const existingTag = await this.foodTagService.findOne({
@@ -305,33 +312,33 @@ export class FoodPostController {
                     newTagIds.push(existingTag.id);
                 }
             }
+            updatedFoodPostVm.foodTags = await this.foodTagService.findAll({
+                tagName: {
+                    $in: tagNames,
+                },
+            });
+            existFoodPost.foodTagIds = newTagIds;
         }
-        const newFoodPost = await this.foodPostService.createFoodPost({
-            userId,
-            title,
-            description,
-            timeEstimate,
-            foodTagIds: newTagIds,
-            srcImages,
-        });
         if (steps) {
+            this.stepService.deleteAll({ postId: id });
             for (const step of steps) {
                 const newStep = await this.stepService.createStep({
-                    postId: newFoodPost.id,
+                    postId: id,
                     no: step.no,
                     content: step.content,
                 });
-
                 newSteps.push(newStep);
             }
+            updatedFoodPostVm.steps = newSteps;
         }
         if (ingredientDetails) {
+            this.ingredientDetailService.deleteAll({ postId: id });
             const ingredientNames = ingredientDetails.map(
                 value => value.ingredientName,
             );
             for (const ingredientName of ingredientNames) {
                 const exist = await this.ingredientService.findOne({
-                    name,
+                    name: ingredientName,
                 });
                 if (!exist) {
                     const newIngredient = await this.ingredientService.createIngredient(
@@ -356,7 +363,7 @@ export class FoodPostController {
             for (let i = 0; i < ingredientDetails.length; i++) {
                 const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                     {
-                        postId: newFoodPost.id,
+                        postId: id,
                         ingredientId: newIngredients[i].id,
                         unitId: unitIds[i],
                         quantity: ingredientDetails[i].quantity,
@@ -364,29 +371,15 @@ export class FoodPostController {
                 );
                 newIngredientDetails.push(newIngredientDetail);
             }
+            updatedFoodPostVm.ingredientDetails = newIngredientDetails;
         }
-        newFoodPost.foodTags = await this.foodTagService.findAll({
-            tagName: {
-                $in: tagNames,
-            },
+        updatedFoodPostVm.comments = await this.commentService.findAll({
+            postId: id,
         });
-        newFoodPost.ingredientDetails = newIngredientDetails;
-        newFoodPost.steps = newSteps;
-        newFoodPost.comments = await this.commentService.findAll({
-            postId: newFoodPost.id,
-        });
-        existFoodPost.userId = userId;
-        existFoodPost.title = title;
-        existFoodPost.description = description;
-        existFoodPost.timeEstimate = timeEstimate;
-        existFoodPost.foodTagIds = newTagIds;
-        existFoodPost.srcImages = srcImages;
-
-        const updatedFoodPost = await this.foodPostService.update(
-            id,
-            existFoodPost,
-        );
-        return this.foodPostService.map<FoodPostVm>(newFoodPost);
+        updatedFoodPostVm.createAt = existFoodPost.createAt;
+        const updatedFoodPost = await this.foodPostService.update(id, existFoodPost);
+        updatedFoodPostVm.updateAt = updatedFoodPost.updateAt;
+        return this.foodPostService.map<FoodPostVm>(updatedFoodPostVm);
     }
 
     @Delete(':id')

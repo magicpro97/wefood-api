@@ -41,6 +41,8 @@ export class FoodPostService extends BaseService<FoodPost> {
         newFoodPost.timeEstimate = timeEstimate;
         newFoodPost.srcImages = srcImages;
         newFoodPost.foodTagIds = foodTagIds;
+        newFoodPostVm.createAt = newFoodPost.createAt;
+        newFoodPostVm.updateAt = newFoodPost.updateAt;
 
         try {
             const result = await this.create(newFoodPost);
