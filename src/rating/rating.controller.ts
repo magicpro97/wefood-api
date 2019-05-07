@@ -12,13 +12,13 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { RatingVm } from './models/view-models/rating-vm.models';
-import { ApiException } from 'src/shared/api-exception.model';
-import { GetOperationId } from 'src/shared/utilities/get-operation-id';
+import { ApiException } from '../shared/api-exception.model';
+import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { Rating } from './models/rating.model';
 import { RatingService } from './rating.service';
 import { map } from 'lodash';
 import { RatingParams } from './models/view-models/rating-params.models';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 
 @Controller('rating')
 export class RatingController {
