@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { RatingService } from './rating.service';
 import { RatingController } from './rating.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Rating } from './models/rating.model';
+import { FoodPostModule } from '../food-post/food-post.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { Rating } from './models/rating.model';
                 schema: Rating.model.schema,
             },
         ]),
+        forwardRef(() => FoodPostModule),
     ],
     providers: [RatingService],
     controllers: [RatingController],

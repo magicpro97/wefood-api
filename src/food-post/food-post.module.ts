@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { FoodPostController } from './food-post.controller';
 import { FoodPostService } from './food-post.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -24,7 +24,7 @@ import { RatingModule } from '../rating/rating.module';
         IngredientDetailModule,
         UnitModule,
         UserModule,
-        RatingModule,
+        forwardRef(() => RatingModule),
     ],
     controllers: [FoodPostController],
     providers: [FoodPostService],

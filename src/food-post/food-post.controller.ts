@@ -9,6 +9,8 @@ import {
     Body,
     Put,
     Query,
+    Inject,
+    forwardRef,
 } from '@nestjs/common';
 import { FoodPostService } from './food-post.service';
 import { FoodPostVm } from './models/view-models/food-post-vm.model';
@@ -42,6 +44,7 @@ export class FoodPostController {
         private readonly stepService: StepService,
         private readonly userService: UserService,
         private readonly unitService: UnitService,
+        @Inject(forwardRef(() => FoodPostService))
         private readonly ratingService: RatingService,
     ) {}
 
@@ -285,7 +288,7 @@ export class FoodPostController {
             newFoodPost.comments = await this.commentService.findAll({
                 postId: newFoodPost.id,
             });
-            newFoodPost.star = 0;
+            newFoodPost.avgStar = 0;
             return this.foodPostService.map<FoodPostVm>(newFoodPost);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -433,14 +436,14 @@ export class FoodPostController {
             postId: id,
         });
         if (ratings.length > 0) {
-            let startAvg = 0;
+            let avgStar = 0;
             for (const rating of ratings) {
-                startAvg += rating.star;
+                avgStar += rating.star;
             }
-            startAvg = startAvg / ratings.length;
-            updatedFoodPostVm.star = startAvg;
+            avgStar = avgStar / ratings.length;
+            updatedFoodPostVm.avgStar = avgStar;
         } else {
-            updatedFoodPostVm.star = 0;
+            updatedFoodPostVm.avgStar = 0;
         }
         await this.foodPostService.update(id, existFoodPost);
         return this.foodPostService.map<FoodPostVm>(updatedFoodPostVm);
@@ -471,5 +474,50 @@ export class FoodPostController {
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Get('trending/post')
+    @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm, isArray: true })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiOperation(GetOperationId(FoodPost.modelName, 'GetTrending'))
+    async getTrending(): Promise<FoodPostVm[]> {
+        const today = new Date();
+        today.setDate(today.getDate() - 7);
+        const foodPosts = await this.foodPostService.findTrendingPost({
+            createAt: {
+                $gte: today,
+            },
+            ratingCount: {
+                $gt: 0,
+            },
+        });
+        const foodPostVms: FoodPostVm[] = [];
+        for (const foodPost of foodPosts) {
+            const foodPostVm = new FoodPostVm();
+            foodPostVm.avgStar = foodPost.avgStar;
+            foodPostVm.createAt = foodPost.createAt;
+            foodPostVm.description = foodPost.description;
+            foodPostVm.updateAt = foodPost.updateAt;
+            foodPostVm.srcImages = foodPost.srcImages;
+            foodPostVm.ratingCount = foodPost.ratingCount;
+            foodPostVm.timeEstimate = foodPost.timeEstimate;
+            foodPostVm.title = foodPost.title;
+            foodPostVm.userId = foodPost.userId;
+            foodPostVm.comments = await this.commentService.findAll({
+                postId: foodPost.id,
+            });
+            foodPostVm.steps = await this.stepService.findAll({
+                postId: foodPost.id,
+            });
+            foodPostVm.ingredientDetails = await this.ingredientDetailService.findAll(
+                { postId: foodPost.id },
+            );
+            foodPostVms.push(foodPostVm);
+        }
+        return foodPostVms;
     }
 }

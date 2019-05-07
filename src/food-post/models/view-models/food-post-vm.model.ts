@@ -14,6 +14,7 @@ export class FoodPostVm extends BaseModelVm {
     @ApiModelPropertyOptional() steps?: StepVm[];
     @ApiModelPropertyOptional() ingredientDetails?: IngredientDetailVm[];
     @ApiModelPropertyOptional() comments?: CommentVm[];
-    @ApiModelPropertyOptional() star?: number;
+    @ApiModelPropertyOptional() avgStar?: number;
+    @ApiModelPropertyOptional() ratingCount?: number;
     @ApiModelPropertyOptional() srcImages?: string[];
 }
