@@ -1,11 +1,11 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { BaseService } from 'src/shared/base.service';
+import { BaseService } from '../shared/base.service';
 import { Rating } from './models/rating.model';
 import { RatingParams } from './models/view-models/rating-params.models';
 
 @Injectable()
 export class RatingService extends BaseService<Rating> {
-    async createFoodTag(params: RatingParams): Promise<Rating> {
+    async createRating(params: RatingParams): Promise<Rating> {
         const { userId, postId, star } = params;
         const newRating = new this.model();
         newRating.userId = userId;
