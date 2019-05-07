@@ -64,6 +64,21 @@ export class MapperService {
         config
             .createMap('FoodPost[]', 'FoodPostVm[]')
             .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Unit', 'UnitVm')
+            .forSourceMember('_id', opts => opts.ignore());
+        config
+            .createMap('Unit[]', 'UnitVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Rating', 'RatingVm')
+            .forSourceMember('_id', opts => opts.ignore());
+
+        config
+            .createMap('Rating[]', 'RatingVm[]')
+            .forSourceMember('_id', opts => opts.ignore());
     }
 
     private initializeMapper(): void {

@@ -28,6 +28,7 @@ import { CommentService } from '../comment/comment.service';
 import { StepVm } from '../step/models/view-models/step-vm.models';
 import { IngredientDetailVm } from '../ingredient-detail/models/view-models/ingredient-detail-vm.model';
 import { IngredientVm } from '../ingredient/models/view-models/ingredient-vm.model';
+import { RatingService } from '../rating/rating.service';
 
 @Controller('food-post')
 @ApiUseTags(FoodPost.modelName)
@@ -41,6 +42,7 @@ export class FoodPostController {
         private readonly stepService: StepService,
         private readonly userService: UserService,
         private readonly unitService: UnitService,
+        private readonly ratingService: RatingService,
     ) {}
 
     @Get()
@@ -283,6 +285,7 @@ export class FoodPostController {
             newFoodPost.comments = await this.commentService.findAll({
                 postId: newFoodPost.id,
             });
+            newFoodPost.star = 0;
             return this.foodPostService.map<FoodPostVm>(newFoodPost);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -426,9 +429,20 @@ export class FoodPostController {
         updatedFoodPostVm.comments = await this.commentService.findAll({
             postId: id,
         });
-        updatedFoodPostVm.createAt = existFoodPost.createAt;
-        const updatedFoodPost = await this.foodPostService.update(id, existFoodPost);
-        updatedFoodPostVm.updateAt = updatedFoodPost.updateAt;
+        const ratings = await this.ratingService.findAll({
+            postId: id,
+        });
+        if (ratings.length > 0) {
+            let startAvg = 0;
+            for (const rating of ratings) {
+                startAvg += rating.star;
+            }
+            startAvg = startAvg / ratings.length;
+            updatedFoodPostVm.star = startAvg;
+        } else {
+            updatedFoodPostVm.star = 0;
+        }
+        await this.foodPostService.update(id, existFoodPost);
         return this.foodPostService.map<FoodPostVm>(updatedFoodPostVm);
     }
 

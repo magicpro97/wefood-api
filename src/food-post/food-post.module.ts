@@ -10,6 +10,7 @@ import { IngredientDetailModule } from '../ingredient-detail/ingredient-detail.m
 import { UnitModule } from '../unit/unit.module';
 import { UserModule } from '../user/user.module';
 import { CommentModule } from '../comment/comment.module';
+import { RatingModule } from '../rating/rating.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { CommentModule } from '../comment/comment.module';
         IngredientDetailModule,
         UnitModule,
         UserModule,
+        RatingModule,
     ],
     controllers: [FoodPostController],
     providers: [FoodPostService],
