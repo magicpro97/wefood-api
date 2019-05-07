@@ -10,7 +10,7 @@ import {
     Param,
     Delete,
 } from '@nestjs/common';
-import { ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiResponse, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { RatingVm } from './models/view-models/rating-vm.models';
 import { ApiException } from '../shared/api-exception.model';
 import { GetOperationId } from '../shared/utilities/get-operation-id';
@@ -21,6 +21,7 @@ import { RatingParams } from './models/view-models/rating-params.models';
 import { UserService } from '../user/user.service';
 
 @Controller('rating')
+@ApiUseTags(Rating.modelName)
 export class RatingController {
     constructor(
         private readonly ratingService: RatingService,
@@ -98,8 +99,11 @@ export class RatingController {
             );
         }
 
-        if (!star) {
-            throw new HttpException('star is required', HttpStatus.BAD_REQUEST);
+        if (!(star > 0)) {
+            throw new HttpException(
+                'star must be greater than 0',
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
         try {
@@ -110,11 +114,16 @@ export class RatingController {
                     HttpStatus.BAD_REQUEST,
                 );
             }
-        } catch (e) {
-            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        try {
+            const existingRating = await this.ratingService.findOne({
+                userId,
+                postId,
+            });
+            if (existingRating) {
+                throw new HttpException(
+                    `Rating is exist. Please use other methods.`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
             const newRating = await this.ratingService.createRating(params);
             return this.ratingService.map<Rating>(newRating);
         } catch (e) {
@@ -155,8 +164,13 @@ export class RatingController {
             exist.postId = postId;
         }
 
-        if (star) {
+        if (star > 0) {
             exist.star = star;
+        } else {
+            throw new HttpException(
+                'star must be greater than 0',
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
         try {
