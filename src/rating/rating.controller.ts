@@ -115,7 +115,7 @@ export class RatingController {
         }
 
         try {
-            const newRating = await this.ratingService.createFoodTag(params);
+            const newRating = await this.ratingService.createRating(params);
             return this.ratingService.map<Rating>(newRating);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
