@@ -52,4 +52,12 @@ export class FoodPostService extends BaseService<FoodPost> {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    async findTrendingPost(filter = {}) {
+        return await this.model
+            .find(filter)
+            .limit(10)
+            .sort({ ratingCount: -1 })
+            .exec();
+    }
 }

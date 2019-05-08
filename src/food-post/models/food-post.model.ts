@@ -19,6 +19,10 @@ export class FoodPost extends BaseModel<FoodPost> {
 
     @prop() srcImages?: string[];
 
+    @prop() avgStar?: number;
+
+    @prop() ratingCount?: number;
+
     static get model(): ModelType<FoodPost> {
         return new FoodPost().getModelForClass(FoodPost, { schemaOptions });
     }

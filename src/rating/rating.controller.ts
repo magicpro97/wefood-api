@@ -9,6 +9,8 @@ import {
     Put,
     Param,
     Delete,
+    forwardRef,
+    Inject,
 } from '@nestjs/common';
 import { ApiResponse, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { RatingVm } from './models/view-models/rating-vm.models';
@@ -19,6 +21,7 @@ import { RatingService } from './rating.service';
 import { map } from 'lodash';
 import { RatingParams } from './models/view-models/rating-params.models';
 import { UserService } from '../user/user.service';
+import { FoodPostService } from '../food-post/food-post.service';
 
 @Controller('rating')
 @ApiUseTags(Rating.modelName)
@@ -26,6 +29,8 @@ export class RatingController {
     constructor(
         private readonly ratingService: RatingService,
         private readonly userService: UserService,
+        @Inject(forwardRef(() => FoodPostService))
+        readonly foodPostService: FoodPostService,
     ) {}
 
     @Get()
@@ -114,6 +119,15 @@ export class RatingController {
                     HttpStatus.BAD_REQUEST,
                 );
             }
+
+            const existingPost = await this.foodPostService.findById(postId);
+            if (!existingPost) {
+                throw new HttpException(
+                    `${postId} is not exists`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+
             const existingRating = await this.ratingService.findOne({
                 userId,
                 postId,
@@ -125,6 +139,16 @@ export class RatingController {
                 );
             }
             const newRating = await this.ratingService.createRating(params);
+            const ratings = await this.ratingService.findAll({
+                postId,
+            });
+            let avgStar = 0;
+            for (const rating of ratings) {
+                avgStar += rating.star;
+            }
+            existingPost.avgStar = avgStar / ratings.length;
+            existingPost.ratingCount = ratings.length;
+            this.foodPostService.update(postId, existingPost);
             return this.ratingService.map<Rating>(newRating);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
