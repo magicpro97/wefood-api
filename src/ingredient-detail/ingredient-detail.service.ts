@@ -5,12 +5,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ModelType } from 'typegoose';
 import { MapperService } from '../shared/mapper/mapper.service';
 import { IngredientDetailParams } from './models/view-models/ingredient-detail-params.model';
-import { IngredientDetailVm } from './models/view-models/ingredient-detail-vm.model';
 
 @Injectable()
 export class IngredientDetailService extends BaseService<IngredientDetail> {
-    async updateIngredientDetail(vm: IngredientDetailVm) {
-        const { id, ingredientId, quantity, postId } = vm;
+    async updateIngredientDetail(param: IngredientDetailParams) {
+        const { id, ingredientId, quantity, postId } = param;
         const existingIngredientDetail = await this.findById(id);
 
         if (postId) {

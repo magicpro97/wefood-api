@@ -57,7 +57,7 @@ export class FoodPostController {
     })
     @ApiOperation(GetOperationId(FoodPost.modelName, 'GetAll'))
     async getAllFoodPost(
-        @Query('userId') userId: string,
+        @Query('user') userId?: string,
         @Query('title') title?: string,
         @Query('description') description?: string,
         @Query('timeEstimateFrom') timeEstimateFrom?: number,
@@ -104,9 +104,60 @@ export class FoodPostController {
                     $elemMatch: { $in: foodTagIds },
                 },
             });
-            return this.foodPostService.map<FoodPostVm[]>(
-                map(foodPosts, foodPost => foodPost.toJSON()),
-            );
+            const foodPostUserVms: FoodPostVm[] = [];
+            for (const foodPost of foodPosts) {
+                const foodPostUserVm = new FoodPostVm();
+
+                foodPostUserVm.user = await this.userService.findById(
+                    foodPost.userId,
+                );
+                foodPostUserVm.foodTags = [];
+                for (const foodTagId of foodPost.foodTagIds) {
+                    foodPostUserVm.foodTags.push(
+                        await this.foodTagService.findById(foodTagId),
+                    );
+                }
+
+                foodPostUserVm.createAt = foodPost.createAt;
+                foodPostUserVm.updateAt = foodPost.updateAt;
+                foodPostUserVm.description = foodPost.description;
+                foodPostUserVm.srcImages = foodPost.srcImages;
+                foodPostUserVm.title = foodPost.title;
+                foodPostUserVm.timeEstimate = foodPost.timeEstimate;
+
+                foodPostUserVm.steps = await this.stepService.findAll({
+                    postId: foodPost.id,
+                });
+
+                foodPostUserVm.comments = await this.commentService.findAll({
+                    postId: foodPost.id,
+                });
+
+                // recipe [{unit, ingredient, quantity}]
+                foodPostUserVm.ingredientDetails = [];
+                const ingredientDetails = await this.ingredientDetailService.findAll(
+                    {
+                        postId: foodPost.id,
+                    },
+                );
+                for (const ingredientDetail of ingredientDetails) {
+                    const ingredientDetailVm = new IngredientDetailVm();
+                    ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                        ingredientDetail.ingredientId,
+                    );
+                    ingredientDetailVm.unit = await this.unitService.findById(
+                        ingredientDetail.unitId,
+                    );
+                    ingredientDetailVm.quantity = ingredientDetail.quantity;
+                    foodPostUserVm.ingredientDetails.push(ingredientDetailVm);
+                }
+
+                foodPostUserVm.avgStar = foodPost.avgStar;
+                foodPostUserVm.ratingCount = foodPost.ratingCount;
+
+                foodPostUserVms.push(foodPostUserVm);
+            }
+            return foodPostUserVms;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -133,7 +184,7 @@ export class FoodPostController {
                 foodPostVm.createAt = exist.createAt;
                 foodPostVm.updateAt = exist.updateAt;
                 foodPostVm.id = id;
-                foodPostVm.userId = exist.userId;
+                foodPostVm.user = await this.userService.findById(exist.userId);
                 foodPostVm.title = exist.title;
                 foodPostVm.description = exist.description;
                 foodPostVm.timeEstimate = exist.timeEstimate;
@@ -146,11 +197,29 @@ export class FoodPostController {
                 foodPostVm.steps = await this.stepService.findAll({
                     postId: exist.id,
                 });
-                foodPostVm.ingredientDetails = await this.ingredientDetailService.findAll(
+                const ingredientDetails = await this.ingredientDetailService.findAll(
                     {
                         postId: exist.id,
                     },
                 );
+                const ingredientDetailVms: IngredientDetailVm[] = [];
+                for (const ingredientDetail of ingredientDetails) {
+                    const ingredientDetailVm = new IngredientDetailVm();
+                    ingredientDetailVm.createAt = ingredientDetail.createAt;
+                    ingredientDetailVm.updateAt = ingredientDetail.updateAt;
+                    ingredientDetailVm.id = ingredientDetail.id;
+                    ingredientDetailVm.postId = ingredientDetail.postId;
+                    ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                        ingredientDetail.ingredientId,
+                    );
+                    ingredientDetailVm.unit = await this.unitService.findById(
+                        ingredientDetail.unitId,
+                    );
+                    ingredientDetailVm.quantity = ingredientDetail.quantity;
+                    ingredientDetailVms.push(ingredientDetailVm);
+                }
+                foodPostVm.ingredientDetails = ingredientDetailVms;
+
                 foodPostVm.comments = await this.commentService.findAll({
                     postId: exist.id,
                 });
@@ -275,7 +344,20 @@ export class FoodPostController {
                             quantity: ingredientDetails[i].quantity,
                         },
                     );
-                    newIngredientDetails.push(newIngredientDetail);
+                    const ingredientDetailVm = new IngredientDetailVm();
+                    ingredientDetailVm.createAt = newIngredientDetail.createAt;
+                    ingredientDetailVm.updateAt = newIngredientDetail.updateAt;
+                    ingredientDetailVm.id = newIngredientDetail.id;
+                    ingredientDetailVm.postId = newIngredientDetail.postId;
+                    ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                        newIngredientDetail.ingredientId,
+                    );
+                    ingredientDetailVm.unit = await this.unitService.findById(
+                        newIngredientDetail.unitId,
+                    );
+                    ingredientDetailVm.quantity = newIngredientDetail.quantity;
+
+                    newIngredientDetails.push(ingredientDetailVm);
                 }
             }
             newFoodPost.foodTags = await this.foodTagService.findAll({
@@ -425,7 +507,20 @@ export class FoodPostController {
                         quantity: ingredientDetails[i].quantity,
                     },
                 );
-                newIngredientDetails.push(newIngredientDetail);
+                const ingredientDetailVm = new IngredientDetailVm();
+                ingredientDetailVm.createAt = newIngredientDetail.createAt;
+                ingredientDetailVm.updateAt = newIngredientDetail.updateAt;
+                ingredientDetailVm.id = newIngredientDetail.id;
+                ingredientDetailVm.postId = newIngredientDetail.postId;
+                ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                    newIngredientDetail.ingredientId,
+                );
+                ingredientDetailVm.unit = await this.unitService.findById(
+                    newIngredientDetail.unitId,
+                );
+                ingredientDetailVm.quantity = newIngredientDetail.quantity;
+
+                newIngredientDetails.push(ingredientDetailVm);
             }
             updatedFoodPostVm.ingredientDetails = newIngredientDetails;
         }
@@ -506,16 +601,34 @@ export class FoodPostController {
             foodPostVm.ratingCount = foodPost.ratingCount;
             foodPostVm.timeEstimate = foodPost.timeEstimate;
             foodPostVm.title = foodPost.title;
-            foodPostVm.userId = foodPost.userId;
+            foodPostVm.user = await this.userService.findById(foodPost.userId);
             foodPostVm.comments = await this.commentService.findAll({
                 postId: foodPost.id,
             });
             foodPostVm.steps = await this.stepService.findAll({
                 postId: foodPost.id,
             });
-            foodPostVm.ingredientDetails = await this.ingredientDetailService.findAll(
+
+            const ingredientDetails = await this.ingredientDetailService.findAll(
                 { postId: foodPost.id },
             );
+            const ingredientDetailVms: IngredientDetailVm[] = [];
+            for (const ingredientDetail of ingredientDetails) {
+                const ingredientDetailVm = new IngredientDetailVm();
+                ingredientDetailVm.createAt = ingredientDetail.createAt;
+                ingredientDetailVm.updateAt = ingredientDetail.updateAt;
+                ingredientDetailVm.id = ingredientDetail.id;
+                ingredientDetailVm.postId = ingredientDetail.postId;
+                ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                    ingredientDetail.ingredientId,
+                );
+                ingredientDetailVm.unit = await this.unitService.findById(
+                    ingredientDetail.unitId,
+                );
+                ingredientDetailVm.quantity = ingredientDetail.quantity;
+                ingredientDetailVms.push(ingredientDetailVm);
+            }
+            foodPostVm.ingredientDetails = ingredientDetailVms;
             foodPostVms.push(foodPostVm);
         }
         return foodPostVms;
