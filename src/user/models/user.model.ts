@@ -36,13 +36,13 @@ export class User extends BaseModel<User> {
     @prop()
     email?: string;
     @prop()
-    followings?: ObjectId[];
+    followings?: string[];
     @prop()
-    followers?: ObjectId[];
+    followers?: string[];
     @prop()
-    foodTags?: ObjectId[];
+    foodTags?: string[];
     @prop()
-    articles?: ObjectId[];
+    foodPost?: string[];
 
     static get model(): ModelType<User> {
         return new User().getModelForClass(User, { schemaOptions });

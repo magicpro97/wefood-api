@@ -26,8 +26,125 @@ import { map, isArray } from 'lodash';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Put()
+    @Put(':userId/follow/:followeeId')
     @ApiResponse({ status: HttpStatus.CREATED, type: UserVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiOperation(GetOperationId(User.modelName, 'Follow'))
+    async follow(
+        @Param('userId') userId: string,
+        @Param('followeeId') followeeId: string,
+    ): Promise<UserVm> {
+        const existUser = await this.userService.findById(userId);
+        if (!existUser) {
+            throw new HttpException(
+                `${followeeId} is not exist`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const existFollowee = await this.userService.findById(followeeId);
+        if (!existFollowee) {
+            throw new HttpException(
+                `${followeeId} is not exist`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        if (!existUser.followings) {
+            existUser.followings = [];
+        }
+
+        if (existUser.followings.indexOf(existFollowee.id) !== -1) {
+            throw new HttpException(
+                `${existFollowee.id} have been followed`,
+                HttpStatus.BAD_REQUEST,
+            );
+        } else {
+            existUser.followings.push(existFollowee.id);
+        }
+
+        if (!existFollowee.followers) {
+            existFollowee.followers = [];
+        }
+
+        if (existFollowee.followers.indexOf(existUser.id) !== -1) {
+            throw new HttpException(
+                `${existUser.id} have been follower`,
+                HttpStatus.BAD_REQUEST,
+            );
+        } else {
+            existFollowee.followers.push(existUser.id);
+        }
+        await this.userService.update(existFollowee.id, existFollowee);
+        const updatedUser = await this.userService.update(userId, existUser);
+        return this.userService.map<UserVm>(updatedUser.toJSON());
+    }
+
+    @Put(':userId/unfollow/:followeeId')
+    @ApiResponse({ status: HttpStatus.CREATED, type: UserVm })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiOperation(GetOperationId(User.modelName, 'UnFollow'))
+    async unFollow(
+        @Param('userId') userId: string,
+        @Param('followeeId') followeeId: string,
+    ): Promise<UserVm> {
+        const existUser = await this.userService.findById(userId);
+        if (!existUser) {
+            throw new HttpException(
+                `${followeeId} is not exist`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const existFollowee = await this.userService.findById(followeeId);
+        if (!existFollowee) {
+            throw new HttpException(
+                `${followeeId} is not exist`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const indexFolloweeId = existUser.followings.indexOf(existFollowee.id);
+        if (indexFolloweeId === -1) {
+            throw new HttpException(
+                `${userId} did not follow ${followeeId}`,
+                HttpStatus.BAD_REQUEST,
+            );
+        } else {
+            for (let i = 0; i < existUser.followings.length; i++) {
+                if (existUser.followings[i] === existFollowee.id) {
+                    existUser.followings.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        const indexFollowerId = existFollowee.followers.indexOf(existUser.id);
+        if (indexFollowerId === -1) {
+            throw new HttpException(
+                `${userId} did not follow ${followeeId}`,
+                HttpStatus.BAD_REQUEST,
+            );
+        } else {
+            for (let i = 0; i < existFollowee.followers.length; i++) {
+                if (existFollowee.followers[i] === existUser.id) {
+                    existFollowee.followers.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        await this.userService.update(existFollowee.id, existFollowee);
+        const updatedUser = await this.userService.update(userId, existUser);
+        return this.userService.map<UserVm>(updatedUser.toJSON());
+    }
+
+    @Put()
+    @ApiResponse({ status: HttpStatus.OK, type: UserVm })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
     @ApiOperation(GetOperationId(User.modelName, 'Update'))
     async update(
@@ -38,7 +155,7 @@ export class UserController {
             id,
             firstName,
             address,
-            articles,
+            foodPost,
             dob,
             email,
             followers,
@@ -69,7 +186,7 @@ export class UserController {
         exist.sex = sex !== undefined ? sex : exist.sex;
         exist.lastName = lastName !== undefined ? lastName : exist.lastName;
         exist.srcImage = srcImage !== undefined ? srcImage : exist.srcImage;
-        this.handleArray(articles, exist, 'articles', renew);
+        this.handleArray(foodPost, exist, 'foodPost', renew);
         this.handleArray(followers, exist, 'followers', renew);
         this.handleArray(followings, exist, 'followings', renew);
         this.handleArray(foodTags, exist, 'foodTags', renew);
@@ -83,8 +200,10 @@ export class UserController {
 
     @Get()
     @ApiResponse({ status: HttpStatus.OK, type: UserVm, isArray: true })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UserVm })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, type: UserVm })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
     @ApiOperation(GetOperationId(User.modelName, 'GetAll'))
     async get(): Promise<UserVm[]> {
         try {
@@ -92,6 +211,64 @@ export class UserController {
             return this.userService.map<UserVm[]>(
                 map(users, user => user.toJSON()),
             );
+        } catch (e) {
+            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get(':id/followers')
+    @ApiResponse({ status: HttpStatus.OK, type: UserVm, isArray: true })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiOperation(GetOperationId(User.modelName, 'getAllFollowers'))
+    async getAllFollowers(@Param('id') id: string): Promise<UserVm[]> {
+        try {
+            const existUser = await this.userService.findById(id);
+            if (!existUser) {
+                throw new HttpException(
+                    `${id} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            const followers: UserVm[] = [];
+            if (existUser.followers) {
+                for (const follower of existUser.followers) {
+                    followers.push(await this.userService.findById(follower));
+                }
+            }
+            return followers;
+        } catch (e) {
+            throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get(':id/followees')
+    @ApiResponse({ status: HttpStatus.OK, type: UserVm, isArray: true })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiOperation(GetOperationId(User.modelName, 'getAllFollowees'))
+    async getAllFollowees(@Param('id') id: string): Promise<UserVm[]> {
+        try {
+            const existUser = await this.userService.findById(id);
+            if (!existUser) {
+                throw new HttpException(
+                    `${id} is not exist`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            const followees: UserVm[] = [];
+            if (existUser.followings) {
+                for (const followee of existUser.followings) {
+                    followees.push(await this.userService.findById(followee));
+                }
+            }
+            return followees;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
