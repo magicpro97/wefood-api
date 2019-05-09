@@ -57,7 +57,7 @@ export class FoodPostController {
     })
     @ApiOperation(GetOperationId(FoodPost.modelName, 'GetAll'))
     async getAllFoodPost(
-        @Query('user') userId?: string,
+        @Query('userId') userId?: string,
         @Query('title') title?: string,
         @Query('description') description?: string,
         @Query('timeEstimateFrom') timeEstimateFrom?: number,
@@ -133,7 +133,6 @@ export class FoodPostController {
                     postId: foodPost.id,
                 });
 
-                // recipe [{unit, ingredient, quantity}]
                 foodPostUserVm.ingredientDetails = [];
                 const ingredientDetails = await this.ingredientDetailService.findAll(
                     {
