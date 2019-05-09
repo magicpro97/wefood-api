@@ -1,6 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../user-role.enum';
-import { ObjectId } from 'mongodb';
 import { EnumToArray } from '../../../shared/utilities/enum-to-array';
 
 export class UpdateVm {
@@ -35,14 +34,14 @@ export class UpdateVm {
     dob?: Date;
 
     @ApiModelPropertyOptional()
-    followers?: ObjectId[];
+    followers?: string[];
 
     @ApiModelPropertyOptional()
-    followings?: ObjectId[];
+    followings?: string[];
 
     @ApiModelPropertyOptional()
-    foodTags?: ObjectId[];
+    foodTags?: string[];
 
     @ApiModelPropertyOptional()
-    articles?: ObjectId[];
+    foodPost?: string[];
 }
