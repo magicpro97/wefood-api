@@ -1,6 +1,9 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class IngredientDetailParams {
+    @ApiModelPropertyOptional()
+    id?: string;
+
     @ApiModelProperty()
     postId: string;
 

@@ -16,12 +16,16 @@ import { IngredientDetailVm } from './models/view-models/ingredient-detail-vm.mo
 import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { IngredientDetailService } from './ingredient-detail.service';
 import { IngredientDetailParams } from './models/view-models/ingredient-detail-params.model';
+import { IngredientService } from '../ingredient/ingredient.service';
+import { UnitService } from '../unit/unit.service';
 
 @Controller('ingredient-detail')
 @ApiUseTags(IngredientDetail.modelName)
 export class IngredientDetailController {
     constructor(
         private readonly ingredientDetailService: IngredientDetailService,
+        private readonly ingredientService: IngredientService,
+        private readonly unitService: UnitService,
     ) {}
 
     @Get(':id')
@@ -46,9 +50,21 @@ export class IngredientDetailController {
                     HttpStatus.BAD_REQUEST,
                 );
             }
-            return this.ingredientDetailService.map<IngredientDetailVm>(
-                existingIngredientDetail.toJSON(),
+
+            const ingredientDetailVm = new IngredientDetailVm();
+            ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                existingIngredientDetail.ingredientId,
             );
+
+            ingredientDetailVm.unit = await this.unitService.findById(
+                existingIngredientDetail.unitId,
+            );
+
+            ingredientDetailVm.quantity = existingIngredientDetail.quantity;
+            ingredientDetailVm.id = existingIngredientDetail.id;
+            ingredientDetailVm.createAt = existingIngredientDetail.createAt;
+            ingredientDetailVm.updateAt = existingIngredientDetail.updateAt;
+            return ingredientDetailVm;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -131,10 +147,12 @@ export class IngredientDetailController {
         type: ApiException,
     })
     @ApiOperation(GetOperationId(IngredientDetail.modelName, 'update'))
-    async update(@Body() vm: IngredientDetailVm): Promise<IngredientDetailVm> {
-        const { id, ingredientId, quantity } = vm;
+    async update(
+        @Body() param: IngredientDetailParams,
+    ): Promise<IngredientDetailVm> {
+        const { id, quantity } = param;
 
-        if (!vm || !id) {
+        if (!param || !id) {
             throw new HttpException(
                 'Missing parameters',
                 HttpStatus.BAD_REQUEST,
@@ -158,7 +176,7 @@ export class IngredientDetailController {
             }
 
             const updated = await this.ingredientDetailService.updateIngredientDetail(
-                vm,
+                param,
             );
             return this.ingredientDetailService.map<IngredientDetailVm>(
                 updated,

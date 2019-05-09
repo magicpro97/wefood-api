@@ -4,9 +4,10 @@ import { FoodTagVm } from '../../../food-tag/models/view-models/food-tag-vm.mode
 import { StepVm } from '../../../step/models/view-models/step-vm.models';
 import { IngredientDetailVm } from '../../../ingredient-detail/models/view-models/ingredient-detail-vm.model';
 import { CommentVm } from '../../../comment/models/view-models/comment-vm.model';
+import { UserVm } from '../../../user/models/view-models/user-vm.model';
 
 export class FoodPostVm extends BaseModelVm {
-    @ApiModelProperty() userId: string;
+    @ApiModelProperty() user: UserVm;
     @ApiModelProperty() title: string;
     @ApiModelPropertyOptional() description?: string;
     @ApiModelPropertyOptional() timeEstimate?: number;
