@@ -28,7 +28,6 @@ export class FoodPostService extends BaseService<FoodPost> {
             foodTagIds,
         } = params;
         const newFoodPostVm = new FoodPostVm();
-        newFoodPostVm.user.id = userId;
         newFoodPostVm.title = title;
         newFoodPostVm.description = description;
         newFoodPostVm.timeEstimate = timeEstimate;
