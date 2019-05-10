@@ -33,7 +33,7 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'Create'))
     async create(@Body() params: IngredientParams): Promise<IngredientVm> {
-        const { name, isApproved } = params;
+        const { name } = params;
 
         if (!name) {
             throw new HttpException('Name is required', HttpStatus.BAD_REQUEST);

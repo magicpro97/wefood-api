@@ -12,10 +12,9 @@ export class FoodPostVm extends BaseModelVm {
     @ApiModelPropertyOptional() description?: string;
     @ApiModelPropertyOptional() timeEstimate?: number;
     @ApiModelPropertyOptional() foodTags?: FoodTagVm[];
-    @ApiModelPropertyOptional({ type: StepVm, isArray: true})
-    steps?: StepVm[];
-    @ApiModelPropertyOptional({ type: IngredientDetailVm, isArray: true}) ingredientDetails?: IngredientDetailVm[];
-    @ApiModelPropertyOptional({ type: CommentVm, isArray: true}) comments?: CommentVm[];
+    @ApiModelPropertyOptional() steps?: StepVm[];
+    @ApiModelPropertyOptional() ingredientDetails?: IngredientDetailVm[];
+    @ApiModelPropertyOptional() comments?: CommentVm[];
     @ApiModelPropertyOptional() avgStar?: number;
     @ApiModelPropertyOptional() ratingCount?: number;
     @ApiModelPropertyOptional() srcImages?: string[];
