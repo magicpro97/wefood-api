@@ -3,8 +3,8 @@ import { IngredientDetailController } from './ingredient-detail.controller';
 import { IngredientDetailService } from './ingredient-detail.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IngredientDetail } from './models/ingredient-detail.models';
-import { IngredientModule } from 'src/ingredient/ingredient.module';
-import { UnitModule } from 'src/unit/unit.module';
+import { IngredientModule } from '../ingredient/ingredient.module';
+import { UnitModule } from '../unit/unit.module';
 
 @Module({
     imports: [
