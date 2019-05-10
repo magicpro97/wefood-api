@@ -17,6 +17,7 @@ import { FoodPostVm } from './models/view-models/food-post-vm.model';
 import { FoodPost } from './models/food-post.model';
 import { ApiUseTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { ApiException } from '../shared/api-exception.model';
+import { map } from 'lodash';
 import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { FoodPostPrams } from './models/view-models/food-post-params.model';
 import { FoodTagService } from '../food-tag/food-tag.service';
@@ -363,7 +364,6 @@ export class FoodPostController {
                     $in: tagNames,
                 },
             });
-            newFoodPost.user =  await this.userService.findById(userId);
             newFoodPost.ingredientDetails = newIngredientDetails;
             newFoodPost.steps = newSteps;
             newFoodPost.comments = await this.commentService.findAll({
@@ -480,7 +480,7 @@ export class FoodPostController {
                 if (!exist) {
                     const newIngredient = await this.ingredientService.createIngredient(
                         {
-                            name : ingredientName,
+                            name,
                             isApproved: false,
                         },
                     );
