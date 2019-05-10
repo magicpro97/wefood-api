@@ -480,7 +480,7 @@ export class FoodPostController {
                 if (!exist) {
                     const newIngredient = await this.ingredientService.createIngredient(
                         {
-                            name,
+                            name : ingredientName,
                             isApproved: false,
                         },
                     );
