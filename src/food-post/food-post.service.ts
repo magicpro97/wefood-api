@@ -52,11 +52,26 @@ export class FoodPostService extends BaseService<FoodPost> {
         }
     }
 
-    async findTrendingPost(filter = {}) {
-        return await this.model
+    async findTrendingPost(filter = {}): Promise<FoodPost[]> {
+        return this.model
             .find(filter)
             .limit(10)
             .sort({ ratingCount: -1 })
             .exec();
+    }
+
+    async findRandomPost(filter = {}): Promise<FoodPost[]> {
+        const count = await this.model.count(filter).exec();
+        const random = Math.floor(Math.random() * count);
+        const foodPosts: FoodPost[] = [];
+        for (let i = 0; i < 5; i++) {
+            foodPosts.push(
+                await this.model
+                    .findOne(filter)
+                    .skip(random)
+                    .exec(),
+            );
+        }
+        return foodPosts;
     }
 }
