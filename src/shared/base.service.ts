@@ -48,6 +48,16 @@ export class BaseService<T extends Typegoose> {
         return this.model.findOne(filter).exec();
     }
 
+    async findOneAndUpdate(filter = {}, obj: any): Promise<InstanceType<T>> {
+        return this.model
+            .findOneAndUpdate(
+                filter,
+                { $set: obj },
+                { upsert: true, new: true },
+            )
+            .exec();
+    }
+
     async findOneAndDelete(filter = {}): Promise<InstanceType<T>> {
         return this.model.findOneAndDelete(filter).exec();
     }
