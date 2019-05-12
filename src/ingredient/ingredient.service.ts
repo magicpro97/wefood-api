@@ -9,9 +9,9 @@ import { IngredientVm } from './models/view-models/ingredient-vm.model';
 
 @Injectable()
 export class IngredientService extends BaseService<Ingredient> {
-    async updateIngredient(vm: IngredientVm): Promise<Ingredient> {
-        const { name, srcImage } = vm;
-        const existingIngredient = await this.findById(vm.id);
+    async updateIngredient(params: IngredientParams): Promise<Ingredient> {
+        const { id, name, srcImage } = params;
+        const existingIngredient = await this.findById(id);
 
         if (name) {
             existingIngredient.name = name;
@@ -20,7 +20,7 @@ export class IngredientService extends BaseService<Ingredient> {
         if (srcImage) {
             existingIngredient.srcImage = srcImage;
         }
-        const updated = await this.update(vm.id, existingIngredient);
+        const updated = await this.update(id, existingIngredient);
         return updated.toJSON() as Ingredient;
     }
 

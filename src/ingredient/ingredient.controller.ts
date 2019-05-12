@@ -156,10 +156,10 @@ export class IngredientController {
         type: ApiException,
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'update'))
-    async update(@Body() vm: IngredientVm): Promise<IngredientVm> {
-        const { id } = vm;
+    async update(@Body() params: IngredientParams): Promise<IngredientVm> {
+        const { id } = params;
         try {
-            if (!vm || !id) {
+            if (!params || !id) {
                 throw new HttpException(
                     'Missing parameters',
                     HttpStatus.BAD_REQUEST,
@@ -175,7 +175,7 @@ export class IngredientController {
                 );
             }
 
-            const updated = await this.ingredientService.updateIngredient(vm);
+            const updated = await this.ingredientService.updateIngredient(params);
             return this.ingredientService.map<IngredientVm>(updated);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
