@@ -369,17 +369,13 @@ export class FoodPostController {
 
             if (tagNames) {
                 for (const tagName of tagNames) {
-                    const existingTag = await this.foodTagService.findOne({
-                        tagName,
-                    });
-                    if (!existingTag) {
-                        const newTag = await this.foodTagService.createFoodTag({
+                    const existingTag = await this.foodTagService.findOneAndUpdate(
+                        {
                             tagName,
-                        });
-                        newTagIds.push(newTag.id);
-                    } else {
-                        newTagIds.push(existingTag.id);
-                    }
+                        },
+                        { tagName },
+                    );
+                    newTagIds.push(existingTag.id);
                 }
             }
             const newFoodPost = await this.foodPostService.createFoodPost({
@@ -400,43 +396,52 @@ export class FoodPostController {
 
                     newSteps.push(newStep);
                 }
+
+                newFoodPost.steps = newSteps;
             }
             if (ingredientDetails) {
+                // Transform array of ingredientDetail to array of ingredient name
                 const ingredientNames = ingredientDetails.map(
                     value => value.ingredientName,
                 );
+
+                // Check if ingredientName is exist to create it when it is not exist
                 for (const ingredientName of ingredientNames) {
-                    const exist = await this.ingredientService.findOne({
-                        name: ingredientName,
-                    });
-                    if (!exist) {
-                        const newIngredient = await this.ingredientService.createIngredient(
-                            {
-                                name: ingredientName,
-                                isApproved: false,
-                            },
-                        );
-                        newIngredients.push(newIngredient);
-                    } else {
-                        newIngredients.push(exist);
-                    }
+                    const exist = await this.ingredientService.findOneAndUpdate(
+                        {
+                            name: ingredientName,
+                        },
+                        { name: ingredientName, isApprove: false },
+                    );
+
+                    newIngredients.push(exist);
                 }
+
+                // Transform array of ingredientDetail to array of unit name
+                const unitNames = ingredientDetails.map(item => item.unitName);
+
+                // Collect unit name form server
                 const units = await this.unitService.findAll({
                     unitName: {
-                        $in: ingredientDetails.map(item => item.unit),
+                        $in: unitNames,
                     },
                 });
+
+                // unitIds <- unitNames + units
+                const newUnitNames = unitNames.reduce((current, value) => {
+                    current[value] = true;
+                    return current;
+                }, {});
+                const unitIds = units.filter(
+                    value => newUnitNames[value.unitName],
+                );
+
                 for (let i = 0; i < ingredientDetails.length; i++) {
                     const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                         {
                             postId: newFoodPost.id,
                             ingredientId: newIngredients[i].id,
-                            unitId: units.find(unit => {
-                                return (
-                                    unit.unitName ===
-                                    ingredientDetails[i].unit
-                                );
-                            }).id,
+                            unitId: unitIds[i].id,
                             quantity: ingredientDetails[i].quantity,
                         },
                     );
@@ -455,6 +460,8 @@ export class FoodPostController {
 
                     newIngredientDetails.push(ingredientDetailVm);
                 }
+
+                newFoodPost.ingredientDetails = newIngredientDetails;
             }
             newFoodPost.foodTags = await this.foodTagService.findAll({
                 tagName: {
@@ -462,8 +469,7 @@ export class FoodPostController {
                 },
             });
             newFoodPost.user = await this.userService.findById(userId);
-            newFoodPost.ingredientDetails = newIngredientDetails;
-            newFoodPost.steps = newSteps;
+
             newFoodPost.comments = await this.commentService.findAll({
                 postId: newFoodPost.id,
             });
@@ -535,17 +541,13 @@ export class FoodPostController {
 
         if (tagNames) {
             for (const tagName of tagNames) {
-                const existingTag = await this.foodTagService.findOne({
-                    tagName,
-                });
-                if (!existingTag) {
-                    const newTag = await this.foodTagService.createFoodTag({
+                const existingTag = await this.foodTagService.findOneAndUpdate(
+                    {
                         tagName,
-                    });
-                    newTagIds.push(newTag.id);
-                } else {
-                    newTagIds.push(existingTag.id);
-                }
+                    },
+                    { tagName },
+                );
+                newTagIds.push(existingTag.id);
             }
             updatedFoodPostVm.foodTags = await this.foodTagService.findAll({
                 tagName: {
@@ -566,41 +568,50 @@ export class FoodPostController {
             }
             updatedFoodPostVm.steps = newSteps;
         }
+
         if (ingredientDetails) {
             this.ingredientDetailService.deleteAll({ postId: id });
+
+            // Transform array of ingredientDetail to array of ingredient name
             const ingredientNames = ingredientDetails.map(
                 value => value.ingredientName,
             );
+
+            // Check if ingredientName is exist to create it when it is not exist
             for (const ingredientName of ingredientNames) {
-                const exist = await this.ingredientService.findOne({
-                    name: ingredientName,
-                });
-                if (!exist) {
-                    const newIngredient = await this.ingredientService.createIngredient(
-                        {
-                            name: ingredientName,
-                            isApproved: false,
-                        },
-                    );
-                    newIngredients.push(newIngredient);
-                } else {
-                    newIngredients.push(exist);
-                }
+                const exist = await this.ingredientService.findOneAndUpdate(
+                    {
+                        name: ingredientName,
+                    },
+                    { name: ingredientName, isApprove: false },
+                );
+
+                newIngredients.push(exist);
             }
 
+            // Transform array of ingredientDetail to array of unit name
+            const unitNames = ingredientDetails.map(item => item.unitName);
+
+            // Collect unit name form server
             const units = await this.unitService.findAll({
                 unitName: {
-                    $in: ingredientDetails.map(item => item.unit),
+                    $in: unitNames,
                 },
             });
-            const unitIds = units.map(unit => unit.id);
+
+            // unitIds <- unitNames + units
+            const newUnitNames = unitNames.reduce((current, value) => {
+                current[value] = true;
+                return current;
+            }, {});
+            const unitIds = units.filter(value => newUnitNames[value.unitName]);
 
             for (let i = 0; i < ingredientDetails.length; i++) {
                 const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                     {
-                        postId: id,
+                        postId: updatedFoodPostVm.id,
                         ingredientId: newIngredients[i].id,
-                        unitId: unitIds[i],
+                        unitId: unitIds[i].id,
                         quantity: ingredientDetails[i].quantity,
                     },
                 );
@@ -619,6 +630,7 @@ export class FoodPostController {
 
                 newIngredientDetails.push(ingredientDetailVm);
             }
+
             updatedFoodPostVm.ingredientDetails = newIngredientDetails;
         }
         updatedFoodPostVm.comments = await this.commentService.findAll({

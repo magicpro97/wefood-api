@@ -96,19 +96,23 @@ export class IngredientController {
             if (!name) {
                 name = '';
             }
+            let ingredients: Array<InstanceType<any>>;
             if (isApproved) {
                 if (isApproved === 'true') {
                     isApproved = true;
                 } else {
                     isApproved = false;
                 }
+                ingredients = await this.ingredientService.findAll({
+                    name: { $regex: name },
+                    isApproved,
+                });
             } else {
-                isApproved = true;
+                ingredients = await this.ingredientService.findAll({
+                    name: { $regex: name },
+                });
             }
-            const ingredients = await this.ingredientService.findAll({
-                name: { $regex: name },
-                isApproved,
-            });
+
             return this.ingredientService.map<IngredientVm[]>(
                 map(ingredients, ingredient => ingredient.toJSON()),
             );

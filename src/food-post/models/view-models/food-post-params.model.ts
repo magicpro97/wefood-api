@@ -15,7 +15,7 @@ class IngredientDetailParam {
     ingredientName: string;
 
     @ApiModelProperty()
-    unit: string;
+    unitName: string;
 
     @ApiModelProperty()
     quantity: number;
@@ -37,7 +37,7 @@ export class FoodPostPrams {
     @ApiModelPropertyOptional({ type: IngredientDetailParam, isArray: true })
     ingredientDetails?: Array<{
         ingredientName: string;
-        unit: string;
+        unitName: string;
         quantity: number;
     }>;
     @ApiModelPropertyOptional() srcImages?: string[];
