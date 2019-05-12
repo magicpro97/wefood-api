@@ -80,18 +80,25 @@ export class FoodPostController {
                 timeEstimateTo = Number.MAX_VALUE;
             }
             const foodTagIds: string[] = [];
-            if (!tags) {
-                const foodTags = await this.foodTagService.findAll({
-                    tagName: {
-                        $in: tags,
-                    },
-                });
-                foodTagIds.concat(foodTags.map(value => value.id));
-            } else if (typeof tags === 'string') {
-                const foodTag = await this.foodTagService.findOne({
-                    tagName: tags,
-                });
-                foodTagIds.push(foodTag.id);
+            if (tags) {
+                if (typeof tags === 'string') {
+                    const foodTag = await this.foodTagService.findOne({
+                        tagName: tags,
+                    });
+                    foodTagIds.push(foodTag.id);
+                } else {
+                    const foodTags = await this.foodTagService.findAll({
+                        tagName: {
+                            $in: tags,
+                        },
+                    });
+                    foodTagIds.concat(foodTags.map(value => value.id));
+                }
+            } else {
+                const foodTags = await this.foodTagService.findAll();
+                for (const foodTagId of foodTags.map(value => value.id)) {
+                    foodTagIds.push(foodTagId);
+                }
             }
             const foodPosts = await this.foodPostService.findAll({
                 userId: {
@@ -111,6 +118,7 @@ export class FoodPostController {
                     $elemMatch: { $in: foodTagIds },
                 },
             });
+
             const foodPostUserVms: FoodPostVm[] = [];
             for (const foodPost of foodPosts) {
                 const foodPostUserVm = new FoodPostVm();
@@ -417,8 +425,10 @@ export class FoodPostController {
                     newIngredients.push(exist);
                 }
 
-                // Transform array of ingredientDetail to array of unit name
-                const unitNames = ingredientDetails.map(item => item.unitName);
+                // Transform array of ingredientDetail to array of unique unit name
+                const unitNames = [
+                    ...new Set(ingredientDetails.map(item => item.unitName)),
+                ];
 
                 // Collect unit name form server
                 const units = await this.unitService.findAll({
@@ -427,21 +437,16 @@ export class FoodPostController {
                     },
                 });
 
-                // unitIds <- unitNames + units
-                const newUnitNames = unitNames.reduce((current, value) => {
-                    current[value] = true;
-                    return current;
-                }, {});
-                const unitIds = units.filter(
-                    value => newUnitNames[value.unitName],
-                );
-
                 for (let i = 0; i < ingredientDetails.length; i++) {
                     const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                         {
                             postId: newFoodPost.id,
                             ingredientId: newIngredients[i].id,
-                            unitId: unitIds[i].id,
+                            unitId: units.find(
+                                unit =>
+                                    unit.unitName ===
+                                    ingredientDetails[i].unitName,
+                            ).id,
                             quantity: ingredientDetails[i].quantity,
                         },
                     );
@@ -589,8 +594,10 @@ export class FoodPostController {
                 newIngredients.push(exist);
             }
 
-            // Transform array of ingredientDetail to array of unit name
-            const unitNames = ingredientDetails.map(item => item.unitName);
+            // Transform array of ingredientDetail to array of unique unit name
+            const unitNames = [
+                ...new Set(ingredientDetails.map(item => item.unitName)),
+            ];
 
             // Collect unit name form server
             const units = await this.unitService.findAll({
@@ -599,19 +606,15 @@ export class FoodPostController {
                 },
             });
 
-            // unitIds <- unitNames + units
-            const newUnitNames = unitNames.reduce((current, value) => {
-                current[value] = true;
-                return current;
-            }, {});
-            const unitIds = units.filter(value => newUnitNames[value.unitName]);
-
             for (let i = 0; i < ingredientDetails.length; i++) {
                 const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                     {
                         postId: updatedFoodPostVm.id,
                         ingredientId: newIngredients[i].id,
-                        unitId: unitIds[i].id,
+                        unitId: units.find(
+                            unit =>
+                                unit.unitName === ingredientDetails[i].unitName,
+                        ).id,
                         quantity: ingredientDetails[i].quantity,
                     },
                 );
