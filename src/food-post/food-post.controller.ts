@@ -30,7 +30,6 @@ import { StepVm } from '../step/models/view-models/step-vm.models';
 import { IngredientDetailVm } from '../ingredient-detail/models/view-models/ingredient-detail-vm.model';
 import { IngredientVm } from '../ingredient/models/view-models/ingredient-vm.model';
 import { RatingService } from '../rating/rating.service';
-import { finished } from 'stream';
 
 @Controller('food-post')
 @ApiUseTags(FoodPost.modelName)
