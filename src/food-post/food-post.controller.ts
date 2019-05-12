@@ -412,7 +412,7 @@ export class FoodPostController {
                     if (!exist) {
                         const newIngredient = await this.ingredientService.createIngredient(
                             {
-                                name,
+                                name: ingredientName,
                                 isApproved: false,
                             },
                         );
@@ -421,20 +421,22 @@ export class FoodPostController {
                         newIngredients.push(exist);
                     }
                 }
-
                 const units = await this.unitService.findAll({
                     unitName: {
                         $in: ingredientDetails.map(item => item.unit),
                     },
                 });
-                const unitIds = units.map(unit => unit.id);
-
                 for (let i = 0; i < ingredientDetails.length; i++) {
                     const newIngredientDetail = await this.ingredientDetailService.createIngredientDetail(
                         {
                             postId: newFoodPost.id,
                             ingredientId: newIngredients[i].id,
-                            unitId: unitIds[i],
+                            unitId: units.find(unit => {
+                                return (
+                                    unit.unitName ===
+                                    ingredientDetails[i].unit
+                                );
+                            }).id,
                             quantity: ingredientDetails[i].quantity,
                         },
                     );
