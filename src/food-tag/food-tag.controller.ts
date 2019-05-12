@@ -125,8 +125,8 @@ export class FoodTagController {
         type: ApiException,
     })
     @ApiOperation(GetOperationId(FoodTag.modelName, 'Update'))
-    async update(@Body() vm: FoodTagVm): Promise<FoodTagVm> {
-        const { id, tagName } = vm;
+    async update(@Body() vm: FoodTagParams): Promise<FoodTagVm> {
+        const { id, tagName, srcImage } = vm;
 
         if (!vm || !id) {
             throw new HttpException(
@@ -142,6 +142,7 @@ export class FoodTagController {
         }
 
         exist.tagName = tagName;
+        exist.srcImage = srcImage;
 
         try {
             const updated = await this.foodTagService.update(id, exist);
