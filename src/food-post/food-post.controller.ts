@@ -61,7 +61,7 @@ export class FoodPostController {
         @Query('description') description?: string,
         @Query('timeEstimateFrom') timeEstimateFrom?: number,
         @Query('timeEstimateTo') timeEstimateTo?: number,
-        @Query('foodTagIds') foodTagIds?: string[],
+        @Query('tags') tags?: string[],
     ): Promise<FoodPostVm[]> {
         try {
             if (!userId) {
@@ -79,11 +79,19 @@ export class FoodPostController {
             if (!timeEstimateTo) {
                 timeEstimateTo = Number.MAX_VALUE;
             }
-            if (!foodTagIds) {
-                const foodTag = await this.foodTagService.findAll();
-                foodTagIds = foodTag.map(value => value.id);
-            } else if (typeof foodTagIds === 'string') {
-                foodTagIds = [foodTagIds];
+            const foodTagIds: string[] = [];
+            if (!tags) {
+                const foodTags = await this.foodTagService.findAll({
+                    tagName: {
+                        $in: tags,
+                    },
+                });
+                foodTagIds.concat(foodTags.map(value => value.id));
+            } else if (typeof tags === 'string') {
+                const foodTag = await this.foodTagService.findOne({
+                    tagName: tags,
+                });
+                foodTagIds.push(foodTag.id);
             }
             const foodPosts = await this.foodPostService.findAll({
                 userId: {
@@ -229,6 +237,94 @@ export class FoodPostController {
         }
     }
 
+    @Get('suggestion/for-user/:userId')
+    @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm, isArray: true })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        type: ApiException,
+    })
+    @ApiOperation(GetOperationId(FoodPost.modelName, 'GetSuggested'))
+    async getSuggestedFoodPost(
+        @Param('userId') userId: string,
+    ): Promise<FoodPostVm[]> {
+        if (!userId) {
+            userId = '';
+        }
+
+        const existingUser = await this.userService.findById(userId);
+        if (!existingUser) {
+            throw new HttpException(
+                `${userId} is not exist`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const foodPosts = await this.foodPostService.findRandomPost({
+            foodTagIds: {
+                $elemMatch: {
+                    $in: existingUser.foodTags,
+                },
+            },
+        });
+
+        const foodPostUserVms: FoodPostVm[] = [];
+        if (foodPosts.length > 0) {
+            for (const foodPost of foodPosts) {
+                const foodPostUserVm = new FoodPostVm();
+
+                foodPostUserVm.user = await this.userService.findById(
+                    foodPost.userId,
+                );
+                foodPostUserVm.foodTags = [];
+                for (const foodTagId of foodPost.foodTagIds) {
+                    foodPostUserVm.foodTags.push(
+                        await this.foodTagService.findById(foodTagId),
+                    );
+                }
+
+                foodPostUserVm.createAt = foodPost.createAt;
+                foodPostUserVm.updateAt = foodPost.updateAt;
+                foodPostUserVm.description = foodPost.description;
+                foodPostUserVm.srcImages = foodPost.srcImages;
+                foodPostUserVm.title = foodPost.title;
+                foodPostUserVm.timeEstimate = foodPost.timeEstimate;
+
+                foodPostUserVm.steps = await this.stepService.findAll({
+                    postId: foodPost.id,
+                });
+
+                foodPostUserVm.comments = await this.commentService.findAll({
+                    postId: foodPost.id,
+                });
+
+                foodPostUserVm.ingredientDetails = [];
+                const ingredientDetails = await this.ingredientDetailService.findAll(
+                    {
+                        postId: foodPost.id,
+                    },
+                );
+                for (const ingredientDetail of ingredientDetails) {
+                    const ingredientDetailVm = new IngredientDetailVm();
+                    ingredientDetailVm.ingredient = await this.ingredientService.findById(
+                        ingredientDetail.ingredientId,
+                    );
+                    ingredientDetailVm.unit = await this.unitService.findById(
+                        ingredientDetail.unitId,
+                    );
+                    ingredientDetailVm.quantity = ingredientDetail.quantity;
+                    foodPostUserVm.ingredientDetails.push(ingredientDetailVm);
+                }
+
+                foodPostUserVm.avgStar = foodPost.avgStar;
+                foodPostUserVm.ratingCount = foodPost.ratingCount;
+
+                foodPostUserVms.push(foodPostUserVm);
+            }
+        }
+        return foodPostUserVms;
+    }
+
     @Post()
     @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
@@ -363,7 +459,7 @@ export class FoodPostController {
                     $in: tagNames,
                 },
             });
-            newFoodPost.user =  await this.userService.findById(userId);
+            newFoodPost.user = await this.userService.findById(userId);
             newFoodPost.ingredientDetails = newIngredientDetails;
             newFoodPost.steps = newSteps;
             newFoodPost.comments = await this.commentService.findAll({
@@ -480,7 +576,7 @@ export class FoodPostController {
                 if (!exist) {
                     const newIngredient = await this.ingredientService.createIngredient(
                         {
-                            name : ingredientName,
+                            name: ingredientName,
                             isApproved: false,
                         },
                     );
