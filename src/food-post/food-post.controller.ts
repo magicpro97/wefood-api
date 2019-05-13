@@ -136,6 +136,7 @@ export class FoodPostController {
                     );
                 }
 
+                foodPostUserVm.id = foodPost.id;
                 foodPostUserVm.createAt = foodPost.createAt;
                 foodPostUserVm.updateAt = foodPost.updateAt;
                 foodPostUserVm.description = foodPost.description;
