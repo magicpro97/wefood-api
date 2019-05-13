@@ -19,12 +19,16 @@ import { GetOperationId } from '../shared/utilities/get-operation-id';
 import { LoginResponseVm } from './models/view-models/login-response-vm.model';
 import { LoginVm } from './models/view-models/login-vm.model';
 import { UpdateVm } from './models/view-models/update-vm.model';
-import { map, isArray } from 'lodash';
+import { map } from 'lodash';
+import { FoodTagService } from '../food-tag/food-tag.service';
 
 @Controller('user')
 @ApiUseTags(User.modelName)
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly foodTagService: FoodTagService,
+    ) {}
 
     @Put(':userId/follow/:followeeId')
     @ApiResponse({ status: HttpStatus.CREATED, type: UserVm })
@@ -208,12 +212,38 @@ export class UserController {
     async get(): Promise<UserVm[]> {
         try {
             const users = await this.userService.findAll();
-            return this.userService.map<UserVm[]>(
-                map(users, user => user.toJSON()),
-            );
+            const userVms: UserVm[] = [];
+            for (const user of users) {
+                userVms.push(await this.userBindind(user));
+            }
+
+            return userVms;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private async userBindind(user: User): Promise<UserVm> {
+        const userVm = new UserVm();
+        userVm.id = user.id;
+        userVm.lastName = user.lastName;
+        userVm.firstName = user.firstName;
+        if (user.foodTags) {
+            userVm.foodTags = (await this.foodTagService.findAll({
+                _id: {
+                    $in: user.foodTags,
+                },
+            })).map(foodTag => foodTag.tagName);
+        }
+        userVm.role = user.role;
+        userVm.sex = user.sex;
+        userVm.srcImage = user.srcImage;
+        userVm.updateAt = user.updateAt;
+        userVm.createAt = user.createAt;
+        userVm.username = user.username;
+        userVm.address = user.address;
+        userVm.foodPost = user.foodPost;
+        return userVm;
     }
 
     @Get(':id/followers')
@@ -236,7 +266,11 @@ export class UserController {
             const followers: UserVm[] = [];
             if (existUser.followers) {
                 for (const follower of existUser.followers) {
-                    followers.push(await this.userService.findById(follower));
+                    followers.push(
+                        await this.userBindind(
+                            await this.userService.findById(follower),
+                        ),
+                    );
                 }
             }
             return followers;
@@ -263,11 +297,17 @@ export class UserController {
                 );
             }
             const followees: UserVm[] = [];
+
             if (existUser.followings) {
                 for (const followee of existUser.followings) {
-                    followees.push(await this.userService.findById(followee));
+                    followees.push(
+                        await this.userBindind(
+                            await this.userService.findById(followee),
+                        ),
+                    );
                 }
             }
+
             return followees;
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -47,5 +47,5 @@ export class UserVm extends BaseModelVm {
     foodTags?: string[];
 
     @ApiModelPropertyOptional()
-    articles?: string[];
+    foodPost?: string[];
 }
