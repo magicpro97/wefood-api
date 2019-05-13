@@ -30,6 +30,7 @@ import { StepVm } from '../step/models/view-models/step-vm.models';
 import { IngredientDetailVm } from '../ingredient-detail/models/view-models/ingredient-detail-vm.model';
 import { IngredientVm } from '../ingredient/models/view-models/ingredient-vm.model';
 import { RatingService } from '../rating/rating.service';
+import { User } from '../user/models/user.model';
 
 @Controller('food-post')
 @ApiUseTags(FoodPost.modelName)
@@ -100,6 +101,7 @@ export class FoodPostController {
                     foodTagIds.push(foodTagId);
                 }
             }
+
             const foodPosts = await this.foodPostService.findAll({
                 userId: {
                     $regex: userId,
@@ -123,9 +125,9 @@ export class FoodPostController {
             for (const foodPost of foodPosts) {
                 const foodPostUserVm = new FoodPostVm();
 
-                foodPostUserVm.user = await this.userService.findById(
-                    foodPost.userId,
-                );
+                const user = await this.userService.findById(foodPost.userId);
+                await this.userBinding(foodPostUserVm, user);
+
                 foodPostUserVm.foodTags = [];
                 for (const foodTagId of foodPost.foodTagIds) {
                     foodPostUserVm.foodTags.push(
@@ -198,7 +200,10 @@ export class FoodPostController {
                 foodPostVm.createAt = exist.createAt;
                 foodPostVm.updateAt = exist.updateAt;
                 foodPostVm.id = id;
-                foodPostVm.user = await this.userService.findById(exist.userId);
+
+                const user = await this.userService.findById(exist.userId);
+                await this.userBinding(foodPostVm, user);
+
                 foodPostVm.title = exist.title;
                 foodPostVm.description = exist.description;
                 foodPostVm.timeEstimate = exist.timeEstimate;
@@ -245,6 +250,25 @@ export class FoodPostController {
         }
     }
 
+    private async userBinding(foodPostVm: FoodPostVm, user: User) {
+        foodPostVm.user.id = user.id;
+        foodPostVm.user.lastName = user.lastName;
+        foodPostVm.user.firstName = user.firstName;
+        foodPostVm.user.foodTags = (await this.foodTagService.findAll({
+            _id: {
+                $in: user.foodTags,
+            },
+        })).map(foodTag => foodTag.tagName);
+        foodPostVm.user.role = user.role;
+        foodPostVm.user.sex = user.sex;
+        foodPostVm.user.srcImage = user.srcImage;
+        foodPostVm.user.updateAt = user.updateAt;
+        foodPostVm.user.createAt = user.createAt;
+        foodPostVm.user.username = user.username;
+        foodPostVm.user.address = user.address;
+        foodPostVm.user.foodPost = user.foodPost;
+    }
+
     @Get('suggestion/for-user/:userId')
     @ApiResponse({ status: HttpStatus.OK, type: FoodPostVm, isArray: true })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ApiException })
@@ -281,9 +305,10 @@ export class FoodPostController {
             for (const foodPost of foodPosts) {
                 const foodPostUserVm = new FoodPostVm();
 
-                foodPostUserVm.user = await this.userService.findById(
-                    foodPost.userId,
-                );
+                const user = await this.userService.findById(foodPost.userId);
+
+                await this.userBinding(foodPostUserVm, user);
+
                 foodPostUserVm.foodTags = [];
                 for (const foodTagId of foodPost.foodTagIds) {
                     foodPostUserVm.foodTags.push(
@@ -473,7 +498,9 @@ export class FoodPostController {
                     $in: tagNames,
                 },
             });
-            newFoodPost.user = await this.userService.findById(userId);
+
+            const user = await this.userService.findById(userId);
+            await this.userBinding(newFoodPost, user);
 
             newFoodPost.comments = await this.commentService.findAll({
                 postId: newFoodPost.id,
@@ -713,7 +740,10 @@ export class FoodPostController {
             foodPostVm.ratingCount = foodPost.ratingCount;
             foodPostVm.timeEstimate = foodPost.timeEstimate;
             foodPostVm.title = foodPost.title;
-            foodPostVm.user = await this.userService.findById(foodPost.userId);
+
+            const user = await this.userService.findById(foodPost.userId);
+            this.userBinding(foodPostVm, user);
+
             foodPostVm.comments = await this.commentService.findAll({
                 postId: foodPost.id,
             });
