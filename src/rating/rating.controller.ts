@@ -47,6 +47,8 @@ export class RatingController {
     async get(
         @Query('starStart') starStart: number,
         @Query('starEnd') starEnd: number,
+        @Query('postId') postId: string,
+        @Query('userId') userId: string,
     ): Promise<RatingVm[]> {
         try {
             if (starStart > starEnd) {
@@ -55,15 +57,36 @@ export class RatingController {
                     HttpStatus.BAD_REQUEST,
                 );
             }
+
             if (!starStart) {
                 starStart = 0;
             }
             if (!starEnd) {
                 starEnd = 5;
             }
-            const ratings = await this.ratingService.findAll({
+            let query: InstanceType<any> = {
                 star: { $gte: starStart, $lte: starEnd },
-            });
+            };
+
+            if (userId && postId) {
+                query = {
+                    userId,
+                    postId,
+                    star: { $gte: starStart, $lte: starEnd },
+                };
+            } else if (userId) {
+                query = {
+                    userId,
+                    star: { $gte: starStart, $lte: starEnd },
+                };
+            } else if (postId) {
+                query = {
+                    postId,
+                    star: { $gte: starStart, $lte: starEnd },
+                };
+            }
+
+            const ratings = await this.ratingService.findAll(query);
             return this.ratingService.map<RatingVm[]>(
                 map(ratings, rating => rating.toJSON()),
             );
