@@ -31,6 +31,7 @@ import { IngredientDetailVm } from '../ingredient-detail/models/view-models/ingr
 import { IngredientVm } from '../ingredient/models/view-models/ingredient-vm.model';
 import { RatingService } from '../rating/rating.service';
 import { User } from '../user/models/user.model';
+import { UserVm } from '../user/models/view-models/user-vm.model';
 
 @Controller('food-post')
 @ApiUseTags(FoodPost.modelName)
@@ -251,14 +252,19 @@ export class FoodPostController {
     }
 
     private async userBinding(foodPostVm: FoodPostVm, user: User) {
+        foodPostVm.user = new UserVm();
         foodPostVm.user.id = user.id;
         foodPostVm.user.lastName = user.lastName;
         foodPostVm.user.firstName = user.firstName;
-        foodPostVm.user.foodTags = (await this.foodTagService.findAll({
-            _id: {
-                $in: user.foodTags,
-            },
-        })).map(foodTag => foodTag.tagName);
+
+        if (user.foodTags) {
+            foodPostVm.user.foodTags = (await this.foodTagService.findAll({
+                _id: {
+                    $in: user.foodTags,
+                },
+            })).map(foodTag => foodTag.tagName);
+        }
+
         foodPostVm.user.role = user.role;
         foodPostVm.user.sex = user.sex;
         foodPostVm.user.srcImage = user.srcImage;
@@ -475,6 +481,7 @@ export class FoodPostController {
                             quantity: ingredientDetails[i].quantity,
                         },
                     );
+
                     const ingredientDetailVm = new IngredientDetailVm();
                     ingredientDetailVm.createAt = newIngredientDetail.createAt;
                     ingredientDetailVm.updateAt = newIngredientDetail.updateAt;
@@ -500,12 +507,14 @@ export class FoodPostController {
             });
 
             const user = await this.userService.findById(userId);
+
             await this.userBinding(newFoodPost, user);
 
             newFoodPost.comments = await this.commentService.findAll({
                 postId: newFoodPost.id,
             });
             newFoodPost.avgStar = 0;
+
             return this.foodPostService.map<FoodPostVm>(newFoodPost);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
