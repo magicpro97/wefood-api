@@ -228,6 +228,7 @@ export class UserController {
         userVm.id = user.id;
         userVm.lastName = user.lastName;
         userVm.firstName = user.firstName;
+
         if (user.foodTags) {
             userVm.foodTags = (await this.foodTagService.findAll({
                 _id: {
@@ -243,6 +244,17 @@ export class UserController {
         userVm.username = user.username;
         userVm.address = user.address;
         userVm.foodPost = user.foodPost;
+        userVm.email = user.email;
+        userVm.dob = user.dob;
+
+        if (user.followers) {
+            userVm.followers = user.followers;
+        }
+
+        if (user.followings) {
+            userVm.followings = user.followings;
+        }
+
         return userVm;
     }
 
