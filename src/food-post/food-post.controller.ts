@@ -413,7 +413,7 @@ export class FoodPostController {
                         {
                             tagName,
                         },
-                        { tagName },
+                        { tagName, createAt: Date.now(), updateAt: Date.now() },
                     );
                     newTagIds.push(existingTag.id);
                 }
@@ -451,7 +451,12 @@ export class FoodPostController {
                         {
                             name: ingredientName,
                         },
-                        { name: ingredientName, isApprove: false },
+                        {
+                            name: ingredientName,
+                            isApprove: false,
+                            createAt: Date.now(),
+                            updateAt: Date.now(),
+                        },
                     );
 
                     newIngredients.push(exist);
@@ -587,7 +592,7 @@ export class FoodPostController {
                     {
                         tagName,
                     },
-                    { tagName },
+                    { tagName, createAt: Date.now(), updateAt: Date.now() },
                 );
                 newTagIds.push(existingTag.id);
             }
@@ -625,7 +630,12 @@ export class FoodPostController {
                     {
                         name: ingredientName,
                     },
-                    { name: ingredientName, isApprove: false },
+                    {
+                        name: ingredientName,
+                        isApprove: false,
+                        createAt: Date.now(),
+                        updateAt: Date.now(),
+                    },
                 );
 
                 newIngredients.push(exist);
