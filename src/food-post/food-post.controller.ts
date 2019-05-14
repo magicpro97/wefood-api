@@ -415,7 +415,11 @@ export class FoodPostController {
                         {
                             tagName,
                         },
-                        { tagName, createAt: Date.now(), updateAt: Date.now() },
+                        {
+                            tagName: tagName.toLowerCase(),
+                            createAt: Date.now(),
+                            updateAt: Date.now(),
+                        },
                     );
                     newTagIds.push(existingTag.id);
                 }
@@ -594,7 +598,11 @@ export class FoodPostController {
                     {
                         tagName,
                     },
-                    { tagName, createAt: Date.now(), updateAt: Date.now() },
+                    {
+                        tagName: tagName.toLowerCase(),
+                        createAt: Date.now(),
+                        updateAt: Date.now(),
+                    },
                 );
                 newTagIds.push(existingTag.id);
             }
