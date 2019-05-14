@@ -321,7 +321,7 @@ export class UserController {
     async getById(@Param('id') id: string): Promise<UserVm> {
         try {
             const user = await this.userService.findById(id);
-            return this.userService.map<UserVm>(user.toJSON());
+            return await this.userBindind(user);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
