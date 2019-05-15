@@ -33,7 +33,7 @@ export class IngredientController {
     })
     @ApiOperation(GetOperationId(Ingredient.modelName, 'Create'))
     async create(@Body() params: IngredientParams): Promise<IngredientVm> {
-        const { name, isApproved } = params;
+        const { name } = params;
 
         if (!name) {
             throw new HttpException('Name is required', HttpStatus.BAD_REQUEST);
@@ -49,6 +49,7 @@ export class IngredientController {
                     HttpStatus.BAD_REQUEST,
                 );
             }
+            params.name = name;
             const newIngredient = await this.ingredientService.createIngredient(
                 params,
             );
@@ -175,7 +176,9 @@ export class IngredientController {
                 );
             }
 
-            const updated = await this.ingredientService.updateIngredient(params);
+            const updated = await this.ingredientService.updateIngredient(
+                params,
+            );
             return this.ingredientService.map<IngredientVm>(updated);
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);

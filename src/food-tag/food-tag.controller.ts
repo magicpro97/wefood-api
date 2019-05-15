@@ -91,6 +91,7 @@ export class FoodTagController {
         }
 
         try {
+            params.tagName = tagName.toLowerCase();
             const newFoodTag = await this.foodTagService.createFoodTag(params);
             return this.foodTagService.map<FoodTag>(newFoodTag);
         } catch (e) {

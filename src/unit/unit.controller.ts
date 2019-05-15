@@ -53,6 +53,7 @@ export class UnitController {
             );
         }
         try {
+            params.unitName = unitName.toLowerCase();
             const newUnit = await this.unitService.createUnit(params);
             return this.unitService.map<Unit>(newUnit);
         } catch (e) {
