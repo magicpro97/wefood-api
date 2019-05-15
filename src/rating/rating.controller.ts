@@ -221,7 +221,24 @@ export class RatingController {
         }
 
         try {
+            const existingPost = await this.foodPostService.findById(postId);
+            if (!existingPost) {
+                throw new HttpException(
+                    `${postId} is not exists`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            const ratings = await this.ratingService.findAll({
+                postId,
+            });
+            let avgStar = 0;
+            for (const rating of ratings) {
+                avgStar += rating.star;
+            }
+            existingPost.avgStar = avgStar / ratings.length;
+            existingPost.ratingCount = ratings.length;
             const updated = await this.ratingService.update(id, exist);
+            this.foodPostService.update(existingPost.id, existingPost);
             return this.ratingService.map<RatingVm>(updated.toJSON());
         } catch (e) {
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
