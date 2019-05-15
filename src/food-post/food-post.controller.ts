@@ -399,7 +399,7 @@ export class FoodPostController {
                 HttpStatus.BAD_REQUEST,
             );
         }
-
+        let newFoodPostId: string = '';
         try {
             const existingUser = await this.userService.findById(userId);
             if (!existingUser) {
@@ -432,6 +432,7 @@ export class FoodPostController {
                 foodTagIds: newTagIds,
                 srcImages,
             });
+            newFoodPostId = newFoodPost.id;
             if (steps) {
                 for (const step of steps) {
                     const newStep = await this.stepService.createStep({
@@ -529,6 +530,13 @@ export class FoodPostController {
 
             return this.foodPostService.map<FoodPostVm>(newFoodPost);
         } catch (e) {
+            this.foodPostService.delete(newFoodPostId);
+            this.ingredientDetailService.deleteAll({
+                postId: newFoodPostId,
+            });
+            this.stepService.deleteAll({
+                postId: newFoodPostId,
+            });
             throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
