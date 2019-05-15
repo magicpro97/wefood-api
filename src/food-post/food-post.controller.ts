@@ -413,7 +413,7 @@ export class FoodPostController {
                 for (const tagName of tagNames) {
                     const existingTag = await this.foodTagService.findOneAndUpdate(
                         {
-                            tagName,
+                            tagName: tagName.toLowerCase(),
                         },
                         {
                             tagName: tagName.toLowerCase(),
@@ -596,7 +596,7 @@ export class FoodPostController {
             for (const tagName of tagNames) {
                 const existingTag = await this.foodTagService.findOneAndUpdate(
                     {
-                        tagName,
+                        tagName: tagName.toLowerCase(),
                     },
                     {
                         tagName: tagName.toLowerCase(),
