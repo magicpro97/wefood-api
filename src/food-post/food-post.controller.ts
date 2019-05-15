@@ -245,6 +245,7 @@ export class FoodPostController {
                     postId: exist.id,
                 });
                 foodPostVm.srcImages = exist.srcImages;
+                foodPostVm.avgStar = exist.avgStar;
                 return this.foodPostService.map<FoodPostVm[]>(foodPostVm);
             }
         } catch (e) {
@@ -323,6 +324,7 @@ export class FoodPostController {
                     );
                 }
 
+                foodPostUserVm.id = foodPost.id;
                 foodPostUserVm.createAt = foodPost.createAt;
                 foodPostUserVm.updateAt = foodPost.updateAt;
                 foodPostUserVm.description = foodPost.description;
