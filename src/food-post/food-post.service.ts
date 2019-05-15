@@ -61,10 +61,9 @@ export class FoodPostService extends BaseService<FoodPost> {
     }
 
     async findRandomPost(filter = {}): Promise<FoodPost[]> {
-        const foodPosts = await this.model.aggregate([
+        return await this.model.aggregate([
             { $match: filter },
             { $sample: { size: 8 } },
-        ]);
-        return foodPosts;
+        ]).exec();
     }
 }
