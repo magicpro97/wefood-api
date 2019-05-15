@@ -324,7 +324,9 @@ export class FoodPostController {
                     );
                 }
 
-                foodPostUserVm.id = foodPost.id;
+                // tslint:disable-next-line:no-string-literal
+                foodPostUserVm.id = foodPost['_id'];
+
                 foodPostUserVm.createAt = foodPost.createAt;
                 foodPostUserVm.updateAt = foodPost.updateAt;
                 foodPostUserVm.description = foodPost.description;
@@ -333,17 +335,17 @@ export class FoodPostController {
                 foodPostUserVm.timeEstimate = foodPost.timeEstimate;
 
                 foodPostUserVm.steps = await this.stepService.findAll({
-                    postId: foodPost.id,
+                    postId: foodPostUserVm.id,
                 });
 
                 foodPostUserVm.comments = await this.commentService.findAll({
-                    postId: foodPost.id,
+                    postId: foodPostUserVm.id,
                 });
 
                 foodPostUserVm.ingredientDetails = [];
                 const ingredientDetails = await this.ingredientDetailService.findAll(
                     {
-                        postId: foodPost.id,
+                        postId: foodPostUserVm.id,
                     },
                 );
                 for (const ingredientDetail of ingredientDetails) {
